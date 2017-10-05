@@ -5,7 +5,7 @@ project(bonavista)
 # C++11.
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 # Include relative to current source dir.
-include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 option(bonavista_tests "Whether to create test targets." ON)
 if (bonavista_tests)
@@ -19,7 +19,7 @@ if (bonavista_tests)
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/googletest")
   set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
   set(BUILD_GTEST ON CACHE BOOL "" FORCE)
-  add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/googletest")
+  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest")
 endif()
 
 add_subdirectory(json)
