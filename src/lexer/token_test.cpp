@@ -1,6 +1,6 @@
 #include "lexer/token.h"
 
-#include "third_party/googletest/src/googletest/include/gtest/gtest.h"
+#include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 TEST(TokenTest, Constructor) {
   Token::Position position;

@@ -2,7 +2,7 @@
 
 #include <memory>
 #include "lexer/lexer.h"
-#include "third_party/googletest/src/googletest/include/gtest/gtest.h"
+#include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 class TestLexer : public Lexer {
  public:

@@ -12,8 +12,7 @@ execute_process(COMMAND "${CMAKE_COMMAND}" --build .
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 # Add directly to our build. This adds following targets:
 #   gtest, gtest_main, gmock, gmock_main
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/src"
-                 "${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/build")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest")
 
 # Use C++11.
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
