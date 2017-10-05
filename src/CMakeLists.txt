@@ -4,8 +4,8 @@ project(bonavista)
 
 # C++11.
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-# Include relative to root source dir.
-include_directories(${CMAKE_SOURCE_DIR})
+# Include relative to current source dir.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 option(bonavista_tests "Whether to create test targets." ON)
 if (bonavista_tests)
@@ -17,7 +17,7 @@ if (bonavista_tests)
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/googletest")
   execute_process(COMMAND "${CMAKE_COMMAND}" --build .
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/googletest")
-  add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/googletest")
+  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest")
 endif()
 
 add_subdirectory(json)
