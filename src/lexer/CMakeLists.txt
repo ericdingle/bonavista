@@ -1,4 +1,4 @@
-add_library(lexer_lib lexer.cpp token.cpp token_stream.cpp)
+add_library(lexer_lib lexer.cpp lexer.h token.cpp token.h token_stream.cpp token_stream.h)
 
 if (bonavista_tests)
   add_executable(lexer_test token_stream_test.cpp token_test.cpp)

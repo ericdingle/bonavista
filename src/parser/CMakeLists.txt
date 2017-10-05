@@ -1,4 +1,4 @@
-add_library(parser_lib ast_node.cpp parser.cpp)
+add_library(parser_lib ast_node.cpp ast_node.h parser.cpp parser.h)
 target_link_libraries(parser_lib lexer_lib)
 
 if (bonavista_tests)

@@ -1,4 +1,4 @@
-add_library(json_lib json_lexer.cpp json_parser.cpp)
+add_library(json_lib json_lexer.cpp json_lexer.h json_parser.cpp json_parser.h)
 target_link_libraries(json_lib lexer_lib parser_lib)
 
 add_executable(json main.cpp)
