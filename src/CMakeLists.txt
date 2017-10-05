@@ -8,12 +8,12 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/googletest")
 execute_process(COMMAND "${CMAKE_COMMAND}" --build .
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/googletest")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest")
+add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/googletest")
 
 # Use C++11.
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 # Allow including files relative to top-level and build directories.
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR})
 # Enable testing.
 enable_testing()
 
