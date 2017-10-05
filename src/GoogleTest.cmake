@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.12)
 
-project(googletest-download NONE)
+project(googletest NONE)
 
 include(ExternalProject)
 ExternalProject_Add(googletest
