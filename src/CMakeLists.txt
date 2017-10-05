@@ -17,6 +17,8 @@ if (bonavista_tests)
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/googletest")
   execute_process(COMMAND "${CMAKE_COMMAND}" --build .
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/googletest")
+  set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+  set(BUILD_GTEST ON CACHE BOOL "" FORCE)
   add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest")
 endif()
 
