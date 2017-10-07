@@ -22,6 +22,6 @@ if (bonavista_tests)
   add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest")
 endif()
 
-add_subdirectory(json)
+add_subdirectory(json EXCLUDE_FROM_ALL)
 add_subdirectory(lexer)
 add_subdirectory(parser)
