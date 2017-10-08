@@ -1,5 +1,6 @@
 #include "lexer/token_stream.h"
 
+#include <assert.h>
 #include "lexer/lexer.h"
 
 TokenStream::TokenStream(const Lexer* lexer, const std::string& input)
@@ -49,7 +50,8 @@ bool TokenStream::GetNextToken(std::unique_ptr<const Token>* token) {
 }
 
 bool TokenStream::HasInput() const {
-  return index_ < input_.length();
+  assert(index_ >= 0);
+  return static_cast<unsigned int>(index_) < input_.length();
 }
 
 const Token::Position& TokenStream::position() const {
