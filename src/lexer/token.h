@@ -5,12 +5,7 @@
 
 class Token {
  public:
-  struct Position {
-    int line = 1;
-    int column = 1;
-  };
-
-  Token(int type, const std::string& value, const Position& position);
+  Token(int type, const std::string& value, int line, int column);
   Token(const Token&) = delete;
   Token& operator=(const Token&) = delete;
   ~Token();
@@ -19,12 +14,14 @@ class Token {
 
   int type() const;
   const std::string& value() const;
-  const Position& position() const;
+  int line() const;
+  int column() const;
 
  private:
   const int type_;
   const std::string value_;
-  const Position position_;
+  const int line_;
+  const int column_;
 };
 
 #endif  // LEXER_TOKEN_H_

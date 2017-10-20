@@ -18,7 +18,8 @@ class TokenStream {
 
   bool HasInput() const;
 
-  const Token::Position& position() const;
+  int line() const;
+  int column() const;
   const std::string& error() const;
 
  private:
@@ -27,7 +28,8 @@ class TokenStream {
   const std::string input_;
   int index_;
 
-  Token::Position position_;
+  int line_;
+  int column_;
   std::string error_;
 };
 

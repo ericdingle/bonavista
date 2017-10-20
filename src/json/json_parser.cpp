@@ -46,7 +46,8 @@ bool JsonParser::ParsePrefixToken(std::unique_ptr<const Token> token,
     return true;
   }
 
-  position_ = token->position();
+  line_ = token->line();
+  column_ = token->column();
   error_ = "Unexpected token: " + token->value();
   return false;
 }
@@ -67,7 +68,8 @@ bool JsonParser::ParseObject(std::unique_ptr<const Token> token,
         return false;
 
       if (!key->token()->IsType(JsonLexer::TYPE_STRING)) {
-        position_ = key->token()->position();
+        line_ = key->token()->line();
+        column_ = key->token()->column();
         error_ = "Expecting string but found " + key->token()->value();
         return false;
       }

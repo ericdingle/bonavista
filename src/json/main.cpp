@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
   std::unique_ptr<const ASTNode> root;
   if (!parser.Parse(&root)) {
     printf("Error: %s at line %d, column %d\n", parser.error().c_str(),
-           parser.position().line, parser.position().column);
+           parser.line(), parser.column());
     return 1;
   }
 

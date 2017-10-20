@@ -1,7 +1,7 @@
 #include "lexer/token.h"
 
-Token::Token(int type, const std::string& value, const Position& position)
-    : type_(type), value_(value), position_(position) {
+Token::Token(int type, const std::string& value, int line, int column)
+    : type_(type), value_(value), line_(line), column_(column) {
 }
 
 Token::~Token() {
@@ -19,6 +19,10 @@ const std::string& Token::value() const {
   return value_;
 }
 
-const Token::Position& Token::position() const {
-  return position_;
+int Token::line() const {
+  return line_;
+}
+
+int Token::column() const {
+  return column_;
 }

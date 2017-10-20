@@ -59,7 +59,8 @@ class TestParser : public Parser {
       return true;
     }
 
-    position_ = token->position();
+    line_ = token->line();
+    column_ = token->column();
     error_ = "Unexpected token: " + token->value();
     return false;
   }
@@ -80,7 +81,8 @@ class TestParser : public Parser {
       return true;
     }
 
-    position_ = token->position();
+    line_ = token->line();
+    column_ = token->column();
     error_ = "Unexpected token: " + token->value();
     return false;
   }
@@ -176,8 +178,8 @@ TEST_F(ParserTest, ConsumeToken) {
 TEST_F(ParserTest, ConsumeTokenError) {
   Init("0");
   EXPECT_FALSE(parser_->Parse(&root_));
-  EXPECT_EQ(1, parser_->position().line);
-  EXPECT_EQ(2, parser_->position().column);
+  EXPECT_EQ(1, parser_->line());
+  EXPECT_EQ(2, parser_->column());
   EXPECT_FALSE(parser_->error().empty());
 }
 

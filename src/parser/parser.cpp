@@ -2,7 +2,8 @@
 
 #include "lexer/lexer.h"
 
-Parser::Parser(TokenStream* token_stream) : token_stream_(token_stream) {
+Parser::Parser(TokenStream* token_stream)
+    : line_(1), column_(1), token_stream_(token_stream) {
 }
 
 Parser::~Parser() {
@@ -28,8 +29,12 @@ bool Parser::HasInput() const {
       token_stream_->HasInput();
 }
 
-const Token::Position& Parser::position() const {
-  return position_;
+int Parser::line() const {
+  return line_;
+}
+
+int Parser::column() const {
+  return column_;
 }
 
 const std::string& Parser::error() const {
@@ -49,7 +54,8 @@ bool Parser::GetNextToken(std::unique_ptr<const Token>* token) {
   *token = std::move(look_ahead_token_);
 
   if (!token_stream_->GetNextToken(&look_ahead_token_)) {
-    position_ = token_stream_->position();
+    line_ = token_stream_->line();
+    column_ = token_stream_->column();
     error_ = token_stream_->error();
     return false;
   }
@@ -85,7 +91,8 @@ bool Parser::ConsumeToken(int type) {
     return false;
 
   if (!token->IsType(type)) {
-    position_ = token->position();
+    line_ = token->line();
+    column_ = token->column();
     error_ = "Unexpected token: " + token->value();
     return false;
   }
@@ -100,7 +107,8 @@ int Parser::GetBindingPower(int type) const {
 bool Parser::ParseInfixToken(std::unique_ptr<const Token> token,
                              std::unique_ptr<const ASTNode> left,
                              std::unique_ptr<const ASTNode>* root) {
-  position_ = token->position();
+  line_ = token->line();
+  column_ = token->column();
   error_ = "Unexpected token: " + token->value();
   return false;
 }

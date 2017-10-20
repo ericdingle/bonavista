@@ -4,7 +4,7 @@
 #include "lexer/lexer.h"
 
 TokenStream::TokenStream(const Lexer* lexer, const std::string& input)
-    : lexer_(lexer), input_(input), index_(0) {
+    : lexer_(lexer), input_(input), index_(0), line_(1), column_(1) {
 }
 
 TokenStream::~TokenStream() {
@@ -17,10 +17,10 @@ bool TokenStream::GetNextToken(std::unique_ptr<const Token>* token) {
     if (c <= ' ') {
       ++index_;
       if (c == '\n') {
-        ++position_.line;
-        position_.column = 1;
+        ++line_;
+        column_ = 1;
       } else {
-        ++position_.column;
+        ++column_;
       }
     } else {
       break;
@@ -29,7 +29,7 @@ bool TokenStream::GetNextToken(std::unique_ptr<const Token>* token) {
 
   // If we've reached the end, we return an end of input token.
   if (!HasInput()) {
-    token->reset(new Token(Lexer::TYPE_END_OF_INPUT, "(end of input)", position_));
+    token->reset(new Token(Lexer::TYPE_END_OF_INPUT, "(end of input)", line_, column_));
     return true;
   }
 
@@ -40,11 +40,11 @@ bool TokenStream::GetNextToken(std::unique_ptr<const Token>* token) {
   if (!lexer_->GetToken(input_, index_, &type, &value, &count, &error_))
     return false;
 
-  token->reset(new Token(type, value, position_));
+  token->reset(new Token(type, value, line_, column_));
 
   // Increment the index and position.
   index_ += count;
-  position_.column += count;
+  column_ += count;
 
   return true;
 }
@@ -54,8 +54,12 @@ bool TokenStream::HasInput() const {
   return static_cast<unsigned int>(index_) < input_.length();
 }
 
-const Token::Position& TokenStream::position() const {
-  return position_;
+int TokenStream::line() const {
+  return line_;
+}
+
+int TokenStream::column() const {
+  return column_;
 }
 
 const std::string& TokenStream::error() const {
