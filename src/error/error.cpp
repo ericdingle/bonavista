@@ -2,8 +2,8 @@
 
 #include <sstream>
 
-Error::Error(int line, int column, const std::string& message)
-    : line_(line), column_(column), message_(message) {
+Error::Error(const std::string& message, int line, int column)
+    : message_(message), line_(line), column_(column) {
 }
 
 std::string Error::message() const {

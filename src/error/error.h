@@ -5,7 +5,7 @@
 
 class Error {
  public:
-  Error(int line, int column, const std::string& message);
+  Error(const std::string& message, int line, int column);
   Error(const Error&) = default;
   Error& operator=(const Error&) = default;
   ~Error() = default;
@@ -14,9 +14,9 @@ class Error {
   std::string ToString() const;
 
  private:
+  const std::string message_;
   const int line_;
   const int column_;
-  const std::string message_;
 };
 
 #endif  // ERROR_ERROR_H_
