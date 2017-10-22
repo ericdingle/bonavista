@@ -24,7 +24,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
 # Include relative to current source dir.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_subdirectory(error)
 add_subdirectory(json EXCLUDE_FROM_ALL)
 add_subdirectory(lexer)
 add_subdirectory(parser)
+add_subdirectory(util)
