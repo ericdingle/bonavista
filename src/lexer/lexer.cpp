@@ -8,10 +8,14 @@ Lexer::Lexer() {
 Lexer::~Lexer() {
 }
 
-bool Lexer::IsAlpha(const char& c) {
+bool Lexer::IsAlpha(char c) {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
-bool Lexer::IsDigit(const char& c) {
+bool Lexer::IsDigit(char c) {
   return c >= '0' && c <= '9';
+}
+
+Status Lexer::UnrecognizedToken(char c, int line, int column) {
+  return Status(std::string("Unrecognized token: ") + c, line, column);
 }

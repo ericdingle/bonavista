@@ -6,6 +6,7 @@
 #include "lexer/token.h"
 #include "lexer/token_stream.h"
 #include "parser/ast_node.h"
+#include "util/status_or.h"
 
 class Parser {
  public:
@@ -14,37 +15,27 @@ class Parser {
   Parser& operator=(const Parser&) = delete;
   virtual ~Parser();
 
-  virtual bool Parse(std::unique_ptr<const ASTNode>* root);
+  virtual StatusOr<std::unique_ptr<ASTNode>> Parse();
 
   bool HasInput() const;
 
-  int line() const;
-  int column() const;
-  const std::string& error() const;
-
- private:
-  bool Init();
-
  protected:
-  bool GetNextToken(std::unique_ptr<const Token>* token);
-  bool ParseExpression(int binding_power, std::unique_ptr<const ASTNode>* root);
-  bool ConsumeToken(int type);
+  static Status UnexpectedToken(const Token& token);
+
+  StatusOr<std::unique_ptr<Token>> GetNextToken();
+  StatusOr<std::unique_ptr<ASTNode>> ParseExpression(int binding_power);
+  Status ConsumeToken(int type);
 
   virtual int GetBindingPower(int type) const;
-  virtual bool ParsePrefixToken(std::unique_ptr<const Token> token,
-                                std::unique_ptr<const ASTNode>* root) = 0;
-  virtual bool ParseInfixToken(std::unique_ptr<const Token> token,
-                               std::unique_ptr<const ASTNode> left,
-                               std::unique_ptr<const ASTNode>* root);
+  virtual StatusOr<std::unique_ptr<ASTNode>> ParsePrefixToken(
+      std::unique_ptr<const Token> token) = 0;
+  virtual StatusOr<std::unique_ptr<ASTNode>> ParseInfixToken(
+      std::unique_ptr<const Token> token, std::unique_ptr<const ASTNode> left);
 
-  std::unique_ptr<const Token> look_ahead_token_;
-
-  int line_;
-  int column_;
-  std::string error_;
+  std::unique_ptr<Token> look_ahead_token_;
 
  private:
-  TokenStream* token_stream_;
+  TokenStream* const token_stream_;
 };
 
 #endif  // PARSER_PARSER_H_

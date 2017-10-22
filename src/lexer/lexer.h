@@ -1,13 +1,14 @@
 #ifndef LEXER_LEXER_H_
 #define LEXER_LEXER_H_
 
+#include <memory>
 #include <string>
+#include "util/status_or.h"
 
 class Token;
 
 class Lexer {
  public:
-  // Lexer token type for end of input.
   static const int TYPE_END_OF_INPUT;
 
   Lexer();
@@ -15,16 +16,14 @@ class Lexer {
   Lexer& operator=(const Lexer&) = delete;
   virtual ~Lexer();
 
-  virtual bool GetToken(const std::string& input,
-                        int index,
-                        int* type,
-                        std::string* value,
-                        int* count,
-                        std::string* error) const = 0;
+  virtual StatusOr<std::unique_ptr<Token>> GetToken(
+      const char* input, int line, int column) const = 0;
 
  protected:
-  static bool IsAlpha(const char& c);
-  static bool IsDigit(const char& c);
+  static bool IsAlpha(char c);
+  static bool IsDigit(char c);
+
+  static Status UnrecognizedToken(char c, int line, int column);
 };
 
 #endif  // LEXER_LEXER_H_

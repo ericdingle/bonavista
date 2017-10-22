@@ -1,4 +1,5 @@
 add_library(lexer_lib lexer.cpp lexer.h token.cpp token.h token_stream.cpp token_stream.h)
+target_link_libraries(lexer_lib util_lib)
 target_include_directories(lexer_lib INTERFACE ${bonavista_SOURCE_DIR})
 
 if (bonavista_tests)

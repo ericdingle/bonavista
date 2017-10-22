@@ -12,7 +12,7 @@ class ASTNode {
   ASTNode& operator=(const ASTNode&) = delete;
   ~ASTNode();
 
-  const Token* token() const;
+  const Token& token() const;
 
   void AddChild(std::unique_ptr<const ASTNode> node);
   const std::vector<std::unique_ptr<const ASTNode>>& children() const;

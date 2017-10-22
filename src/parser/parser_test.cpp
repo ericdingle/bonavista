@@ -12,25 +12,17 @@ class TestLexer : public Lexer {
     TYPE_PLUS
   };
 
-  virtual bool GetToken(const std::string& input,
-                        int index,
-                        int* type,
-                        std::string* value,
-                        int* count,
-                        std::string* error) const {
-    const char& c = input[index];
+  StatusOr<std::unique_ptr<Token>> GetToken(
+      const char* input, int line, int column) const override {
+    char c = input[0];
     if (c == '+') {
-      *type = TYPE_PLUS;
+      return std::unique_ptr<Token>(new Token(TYPE_PLUS, "+", line, column));
     } else if (IsDigit(c)) {
-      *type = TYPE_DIGIT;
-    } else {
-      *error = std::string("Unexpected token: %c") + c;
-      return false;
+      return std::unique_ptr<Token>(new Token(TYPE_DIGIT, std::string(1, c),
+                                              line, column));
     }
 
-    *value = c;
-    *count = 1;
-    return true;
+    return UnrecognizedToken(c, line, column);
   }
 };
 
@@ -40,51 +32,40 @@ class TestParser : public Parser {
   }
 
  protected:
-  virtual int GetBindingPower(int type) const {
-    if (type == TestLexer::TYPE_PLUS)
-        return 10;
-
-    return 0;
+  int GetBindingPower(int type) const override {
+    return type == TestLexer::TYPE_PLUS ? 10 : 0;
   }
 
-  virtual bool ParsePrefixToken(std::unique_ptr<const Token> token,
-                                std::unique_ptr<const ASTNode>* root) {
+  StatusOr<std::unique_ptr<ASTNode>> ParsePrefixToken(
+      std::unique_ptr<const Token> token) override {
     if (token->IsType(TestLexer::TYPE_DIGIT)) {
-      root->reset(new ASTNode(std::move(token)));
+      auto node = std::unique_ptr<ASTNode>(new ASTNode(std::move(token)));
 
       // Weird behavior only for the test.
-      if (root->get()->token()->value() == "0")
-        return ConsumeToken(TestLexer::TYPE_DIGIT);
+      if (node->token().value() == "0") {
+        RETURN_IF_ERROR(ConsumeToken(TestLexer::TYPE_DIGIT));
+      }
 
-      return true;
+      return std::move(node);
     }
 
-    line_ = token->line();
-    column_ = token->column();
-    error_ = "Unexpected token: " + token->value();
-    return false;
+    return UnexpectedToken(*token);
   }
 
-  virtual bool ParseInfixToken(std::unique_ptr<const Token> token,
-                               std::unique_ptr<const ASTNode> left,
-                               std::unique_ptr<const ASTNode>* root) {
+  StatusOr<std::unique_ptr<ASTNode>> ParseInfixToken(
+      std::unique_ptr<const Token> token, std::unique_ptr<const ASTNode> left)
+      override {
     if (token->IsType(TestLexer::TYPE_PLUS)) {
-      std::unique_ptr<ASTNode> node(new ASTNode(std::move(token)));
+      auto node = std::unique_ptr<ASTNode>(new ASTNode(std::move(token)));
       node->AddChild(std::move(left));
 
-      std::unique_ptr<const ASTNode> right;
-      if (!ParseExpression(10, &right))
-        return false;
+      ASSIGN_OR_RETURN(auto right, ParseExpression(10));
       node->AddChild(std::move(right));
 
-      *root = std::move(node);
-      return true;
+      return std::move(node);
     }
 
-    line_ = token->line();
-    column_ = token->column();
-    error_ = "Unexpected token: " + token->value();
-    return false;
+    return UnexpectedToken(*token);
   }
 };
 
@@ -95,107 +76,83 @@ class ParserTest : public testing::Test {
     parser_.reset(new TestParser(stream_.get()));
   }
 
+  void ExpectStatus(const StatusOr<std::unique_ptr<ASTNode>>& status_or,
+                    const std::string& message) {
+    EXPECT_TRUE(status_or.error());
+    EXPECT_EQ(message, status_or.status().message());
+  }
+
+  void ExpectNode(const StatusOr<std::unique_ptr<ASTNode>>& status_or,
+                  int type, int num_children) {
+    EXPECT_FALSE(status_or.error());
+    const auto& node = status_or.value();
+    EXPECT_EQ(type, node->token().type());
+    EXPECT_EQ(num_children, node->children().size());
+  }
+
+  void ExpectNode(const StatusOr<std::unique_ptr<ASTNode>>& status_or,
+                  int type, const std::string& value, int num_children) {
+    ExpectNode(status_or, type, num_children);
+    EXPECT_EQ(value, status_or.value()->token().value());
+  }
+
   TestLexer lexer_;
   std::unique_ptr<TokenStream> stream_;
   std::unique_ptr<Parser> parser_;
-  std::unique_ptr<const ASTNode> root_;
 };
 
 TEST_F(ParserTest, Empty) {
   Init("");
   EXPECT_FALSE(parser_->HasInput());
-  EXPECT_TRUE(parser_->Parse(&root_));
-  EXPECT_EQ(nullptr, root_.get());
-  EXPECT_FALSE(parser_->HasInput());
+  ExpectStatus(parser_->Parse(), "Unexpected token: (end of input)");
+}
+
+TEST_F(ParserTest, NotEmpty) {
+  Init("a");
+  EXPECT_TRUE(parser_->HasInput());
 }
 
 TEST_F(ParserTest, BadToken) {
   Init("a");
-  EXPECT_TRUE(parser_->HasInput());
-  EXPECT_FALSE(parser_->Parse(&root_));
-  EXPECT_FALSE(parser_->error().empty());
-  EXPECT_TRUE(parser_->HasInput());
+  ExpectStatus(parser_->Parse(), "Unrecognized token: a");
 }
 
 TEST_F(ParserTest, Prefix) {
   Init("1");
-  EXPECT_TRUE(parser_->HasInput());
-  EXPECT_TRUE(parser_->Parse(&root_));
-  EXPECT_NE(nullptr, root_.get());
-  EXPECT_TRUE(root_->token()->IsType(TestLexer::TYPE_DIGIT));
-  EXPECT_EQ(0, root_->children().size());
-
-  EXPECT_FALSE(parser_->HasInput());
-  EXPECT_TRUE(parser_->Parse(&root_));
-  EXPECT_EQ(nullptr, root_.get());
+  ExpectNode(parser_->Parse(), TestLexer::TYPE_DIGIT, 0);
 }
 
 TEST_F(ParserTest, PrefixError) {
   Init("+");
-  EXPECT_FALSE(parser_->Parse(&root_));
-  EXPECT_FALSE(parser_->error().empty());
+  ExpectStatus(parser_->Parse(), "Unexpected token: +");
 }
 
 TEST_F(ParserTest, Infix) {
   Init("1+2");
-  EXPECT_TRUE(parser_->Parse(&root_));
-  EXPECT_NE(nullptr, root_.get());
-  EXPECT_TRUE(root_->token()->IsType(TestLexer::TYPE_PLUS));
-  EXPECT_EQ(2, root_->children().size());
-
-  const ASTNode* child = root_->children()[0].get();
-  EXPECT_TRUE(child->token()->IsType(TestLexer::TYPE_DIGIT));
-  EXPECT_EQ("1", child->token()->value());
-  EXPECT_EQ(0, child->children().size());
-
-  child = root_->children()[1].get();
-  EXPECT_TRUE(child->token()->IsType(TestLexer::TYPE_DIGIT));
-  EXPECT_EQ("2", child->token()->value());
-  EXPECT_EQ(0, child->children().size());
-
-  EXPECT_TRUE(parser_->Parse(&root_));
-  EXPECT_EQ(nullptr, root_.get());
+  ExpectNode(parser_->Parse(), TestLexer::TYPE_PLUS, 2);
 }
 
 TEST_F(ParserTest, InfixError) {
   Init("1+");
-  EXPECT_FALSE(parser_->Parse(&root_));
-  EXPECT_FALSE(parser_->error().empty());
+  ExpectStatus(parser_->Parse(), "Unexpected token: (end of input)");
 }
 
 TEST_F(ParserTest, ConsumeToken) {
   Init("01");
-  EXPECT_TRUE(parser_->Parse(&root_));
-  EXPECT_NE(nullptr, root_.get());
-  EXPECT_TRUE(root_->token()->IsType(TestLexer::TYPE_DIGIT));
-  EXPECT_EQ("0", root_->token()->value());
-  EXPECT_EQ(0, root_->children().size());
-
-  EXPECT_TRUE(parser_->Parse(&root_));
-  EXPECT_EQ(nullptr, root_.get());
+  ExpectNode(parser_->Parse(), TestLexer::TYPE_DIGIT, "0", 0);
 }
 
 TEST_F(ParserTest, ConsumeTokenError) {
   Init("0");
-  EXPECT_FALSE(parser_->Parse(&root_));
-  EXPECT_EQ(1, parser_->line());
-  EXPECT_EQ(2, parser_->column());
-  EXPECT_FALSE(parser_->error().empty());
+  ExpectStatus(parser_->Parse(), "Unexpected token: (end of input)");
 }
 
 TEST_F(ParserTest, ParseMultiple) {
   Init("1 1 1");
 
   for (int i = 0; i < 3; ++i) {
-    EXPECT_TRUE(parser_->Parse(&root_));
-    EXPECT_NE(nullptr, root_.get());
-    EXPECT_TRUE(root_->token()->IsType(TestLexer::TYPE_DIGIT));
-    EXPECT_EQ(0, root_->children().size());
+    ExpectNode(parser_->Parse(), TestLexer::TYPE_DIGIT, "1", 0);
   }
 
-  EXPECT_TRUE(parser_->Parse(&root_));
-  EXPECT_EQ(nullptr, root_.get());
-
-  EXPECT_TRUE(parser_->Parse(&root_));
-  EXPECT_EQ(nullptr, root_.get());
+  ExpectStatus(parser_->Parse(), "Unexpected token: (end of input)");
 }

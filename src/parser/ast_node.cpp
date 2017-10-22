@@ -6,8 +6,8 @@ ASTNode::ASTNode(std::unique_ptr<const Token> token) : token_(std::move(token)) 
 ASTNode::~ASTNode() {
 }
 
-const Token* ASTNode::token() const {
-  return token_.get();
+const Token& ASTNode::token() const {
+  return *token_.get();
 }
 
 void ASTNode::AddChild(std::unique_ptr<const ASTNode> node) {
