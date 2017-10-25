@@ -13,12 +13,8 @@ bool Status::error() const {
   return !message_.empty();
 }
 
-std::string Status::message() const {
-  return message_;
-}
-
 std::string Status::ToString() const {
-  if (message_.empty()) {
+  if (!error()) {
     return "";
   }
 

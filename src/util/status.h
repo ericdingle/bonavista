@@ -11,8 +11,11 @@ class Status {
   Status& operator=(const Status&) = delete;
   ~Status() = default;
 
+  std::string message() const { return message_; }
+  int line() const { return line_; }
+  int column() const { return column_; }
+
   bool error() const;
-  std::string message() const;
   std::string ToString() const;
 
  private:

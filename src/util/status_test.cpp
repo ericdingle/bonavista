@@ -3,15 +3,19 @@
 
 TEST(StatusTest, Default) {
   Status status;
-  EXPECT_FALSE(status.error());
   EXPECT_EQ("", status.message());
+  EXPECT_EQ(0, status.line());
+  EXPECT_EQ(0, status.column());
+  EXPECT_FALSE(status.error());
   EXPECT_EQ("", status.ToString());
 }
 
 TEST(StatusTest, ToString) {
   Status status("blah", 10, 20);
-  EXPECT_TRUE(status.error());
   EXPECT_EQ("blah", status.message());
+  EXPECT_EQ(10, status.line());
+  EXPECT_EQ(20, status.column());
+  EXPECT_TRUE(status.error());
   EXPECT_EQ("blah at line 10, column 20.", status.ToString());
 }
 
