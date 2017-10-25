@@ -12,10 +12,10 @@ class Node {
   Node& operator=(const Node&) = delete;
   ~Node();
 
-  const Token& token() const;
+  const Token& token() const { return *token_; };
+  const std::vector<std::unique_ptr<const Node>>& children() const { return children_; };
 
   void AddChild(std::unique_ptr<const Node> node);
-  const std::vector<std::unique_ptr<const Node>>& children() const;
 
  private:
   const std::unique_ptr<const Token> token_;
