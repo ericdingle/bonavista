@@ -11,21 +11,21 @@ class StatusTest : public testing::Test {
   }
 
   void ExpectStatus(const Status& status, const std::string& message, int line,
-                    int column, bool error, const std::string& to_string) {
+                    int column, bool ok, const std::string& to_string) {
     ExpectStatus(status, message, line, column);
-    EXPECT_EQ(error, status.error());
+    EXPECT_EQ(ok, status.ok());
     EXPECT_EQ(to_string, status.ToString());
   }
 };
 
 TEST_F(StatusTest, DefaultConstructor) {
   Status status;
-  ExpectStatus(status, "", 0, 0, false, "");
+  ExpectStatus(status, "", 0, 0, true, "");
 }
 
 TEST_F(StatusTest, Constructor) {
   Status status("blah", 10, 20);
-  ExpectStatus(status, "blah", 10, 20, true, "blah at line 10, column 20.");
+  ExpectStatus(status, "blah", 10, 20, false, "blah at line 10, column 20.");
 }
 
 TEST_F(StatusTest, CopyConstructor) {

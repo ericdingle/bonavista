@@ -9,12 +9,12 @@ Status::Status(const std::string& message, int line, int column)
     : message_(message), line_(line), column_(column) {
 }
 
-bool Status::error() const {
-  return !message_.empty();
+bool Status::ok() const {
+  return message_.empty();
 }
 
 std::string Status::ToString() const {
-  if (!error()) {
+  if (ok()) {
     return "";
   }
 

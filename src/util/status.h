@@ -15,7 +15,7 @@ class Status {
   int line() const { return line_; }
   int column() const { return column_; }
 
-  bool error() const;
+  bool ok() const;
   std::string ToString() const;
 
  private:
@@ -27,8 +27,8 @@ class Status {
 #define RETURN_IF_ERROR(expr) \
   do {                        \
     Status _status = (expr);  \
-    if (_status.error()) {     \
-      return _status;          \
+    if (!_status.ok()) {      \
+      return _status;         \
     }                         \
   } while (false)
 

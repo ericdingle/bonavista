@@ -9,14 +9,14 @@ class JsonLexerTest : public testing::Test {
  protected:
   void ExpectStatus(const char* input, const std::string& message) {
     auto status_or = lexer_.GetToken(input, 1, 1);
-    ASSERT_TRUE(status_or.error()) << "Input: " << input;
+    ASSERT_FALSE(status_or.ok()) << "Input: " << input;
     EXPECT_EQ(message, status_or.status().message()) << input;
   }
 
   void ExpectToken(const char* input, int type, const std::string& value,
                    int length=0) {
     auto status_or = lexer_.GetToken(input, 1, 1);
-    ASSERT_FALSE(status_or.error()) << "Input: " << input << ". Status: " <<
+    ASSERT_TRUE(status_or.ok()) << "Input: " << input << ". Status: " <<
         status_or.status().ToString();
     const auto& token = status_or.value();
     EXPECT_EQ(type, token->type());

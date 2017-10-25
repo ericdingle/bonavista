@@ -25,9 +25,9 @@ class TokenStreamTest : public testing::Test {
  protected:
   void ExpectToken(TokenStream* token_stream, int type, const std::string& value,
                    int line, int column) {
-    auto error_or = token_stream->GetNextToken();
-    EXPECT_FALSE(error_or.error());
-    auto token = error_or.value();
+    auto status_or = token_stream->GetNextToken();
+    EXPECT_TRUE(status_or.ok());
+    auto token = status_or.value();
     EXPECT_EQ(type, token->type());
     EXPECT_EQ(value, token->value());
     EXPECT_EQ(line, token->line());
@@ -59,6 +59,6 @@ TEST_F(TokenStreamTest, GetNextTokenError) {
   EXPECT_TRUE(token_stream.HasInput());
 
   auto status_or = token_stream.GetNextToken();
-  EXPECT_TRUE(status_or.error());
+  EXPECT_FALSE(status_or.ok());
   EXPECT_EQ("fail", status_or.status().message());
 }

@@ -78,13 +78,13 @@ class ParserTest : public testing::Test {
 
   void ExpectStatus(const StatusOr<std::unique_ptr<ASTNode>>& status_or,
                     const std::string& message) {
-    EXPECT_TRUE(status_or.error());
+    EXPECT_FALSE(status_or.ok());
     EXPECT_EQ(message, status_or.status().message());
   }
 
   void ExpectNode(const StatusOr<std::unique_ptr<ASTNode>>& status_or,
                   int type, int num_children) {
-    EXPECT_FALSE(status_or.error());
+    EXPECT_TRUE(status_or.ok());
     const auto& node = status_or.value();
     EXPECT_EQ(type, node->token().type());
     EXPECT_EQ(num_children, node->children().size());
@@ -104,16 +104,16 @@ class ParserTest : public testing::Test {
 TEST_F(ParserTest, ExpectToken) {
   Token token(1, "a", 2, 3);
   Status s1 = Parser::ExpectToken(token, 1);
-  EXPECT_FALSE(s1.error());
+  EXPECT_TRUE(s1.ok());
   Status s2 = Parser::ExpectToken(token, 2);
-  EXPECT_TRUE(s2.error());
+  EXPECT_FALSE(s2.ok());
   EXPECT_EQ("Unexpected token: a", s2.message());
 }
 
 TEST_F(ParserTest, UnexpectedToken) {
   Token token(1, "a", 2, 3);
   Status s = Parser::UnexpectedToken(token);
-  EXPECT_TRUE(s.error());
+  EXPECT_FALSE(s.ok());
   EXPECT_EQ("Unexpected token: a", s.message());
   EXPECT_EQ(2, s.line());
   EXPECT_EQ(3, s.column());

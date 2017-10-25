@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 
   JsonParser parser(&stream);
   StatusOr<std::unique_ptr<ASTNode>> status_or = parser.Parse();
-  if (status_or.error()) {
+  if (!status_or.ok()) {
     printf("Error: %s\n", status_or.status().ToString().c_str());
     return 1;
   }
