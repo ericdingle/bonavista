@@ -22,14 +22,13 @@ int main(int argc, char* argv[]) {
   TokenStream stream(&lexer, buffer.c_str());
 
   JsonParser parser(&stream);
-  std::unique_ptr<const ASTNode> root;
-  if (!parser.Parse(&root)) {
-    printf("Error: %s at line %d, column %d\n", parser.error().c_str(),
-           parser.line(), parser.column());
+  StatusOr<std::unique_ptr<ASTNode>> status_or = parser.Parse();
+  if (status_or.error()) {
+    printf("Error: %s\n", status_or.status().ToString().c_str());
     return 1;
   }
 
-  PrintJsonTree(root.get(), 0);
+  PrintJsonTree(status_or.value().get(), 0);
   printf("\n");
 
   return 0;
@@ -38,13 +37,13 @@ int main(int argc, char* argv[]) {
 void PrintJsonTree(const ASTNode* node, int level) {
   std::string indent(2 * level, ' ');
 
-  if (node->token()->IsType(JsonLexer::TYPE_LEFT_BRACE)) {
+  if (node->token().IsType(JsonLexer::TYPE_LEFT_BRACE)) {
     printf("{");
     const std::vector<std::unique_ptr<const ASTNode> >& children = node->children();
     const char* comma = "";
     for(uint i = 0; i < children.size(); i += 2) {
       printf("%s\n%s  %s: ", comma, indent.c_str(),
-             children[i]->token()->value().c_str());
+             children[i]->token().value().c_str());
       comma = ",";
       PrintJsonTree(children[i + 1].get(), level + 1);
     }
@@ -52,7 +51,7 @@ void PrintJsonTree(const ASTNode* node, int level) {
     return;
   }
 
-  if (node->token()->IsType(JsonLexer::TYPE_LEFT_BRACKET)) {
+  if (node->token().IsType(JsonLexer::TYPE_LEFT_BRACKET)) {
     printf("[");
     const std::vector<std::unique_ptr<const ASTNode> >& children = node->children();
     const char* comma = "";
@@ -65,10 +64,10 @@ void PrintJsonTree(const ASTNode* node, int level) {
     return;
   }
 
-  if (node->token()->IsType(JsonLexer::TYPE_STRING)) {
-    printf("\"%s\"", node->token()->value().c_str());
+  if (node->token().IsType(JsonLexer::TYPE_STRING)) {
+    printf("\"%s\"", node->token().value().c_str());
     return;
   }
 
-  printf("%s", node->token()->value().c_str());
+  printf("%s", node->token().value().c_str());
 }

@@ -1,217 +1,134 @@
 #include "json/json_lexer.h"
 
-JsonLexer::JsonLexer() {
-}
+#include <cstring>
 
-JsonLexer::~JsonLexer() {
-}
-
-bool JsonLexer::GetToken(const std::string& input,
-                         int index,
-                         int* type,
-                         std::string* value,
-                         int* count,
-                         std::string* error) const {
-  const char& c = input[index];
-  if (IsAlpha(c))
-    return GetKeywordToken(input, index, type, value, count, error);
-  else if (IsDigit(c) || c == '-')
-    return GetNumberToken(input, index, type, value, count, error);
-  else if (c == '"')
-    return GetStringToken(input, index, type, value, count, error);
+StatusOr<std::unique_ptr<Token>> JsonLexer::GetToken(
+    const char* input, int line, int column) const {
+  char c = *input;
+  if (IsAlpha(c)) {
+    return GetKeywordToken(input, line, column);
+  } else if (IsDigit(c) || c == '-') {
+    return GetNumberToken(input, line, column);
+  } else if (c == '"') {
+    return GetStringToken(input, line, column);
+  }
 
   int t = -1;
-  if (c == ':')
+  if (c == ':') {
     t = TYPE_COLON;
-  else if (c == ',')
+  } else if (c == ',') {
     t = TYPE_COMMA;
-  else if (c == '{')
+  } else if (c == '{') {
     t = TYPE_LEFT_BRACE;
-  else if (c == '}')
+  } else if (c == '}') {
     t = TYPE_RIGHT_BRACE;
-  else if (c == '[')
+  } else if (c == '[') {
     t = TYPE_LEFT_BRACKET;
-  else if (c == ']')
+  } else if (c == ']') {
     t = TYPE_RIGHT_BRACKET;
+  }
 
   if (t != -1) {
-    *type = t;
-    *value = c;
-    *count = 1;
-    return true;
+    return std::unique_ptr<Token>(new Token(t, c, line, column));
   }
 
-  *error = std::string("Unrecognized token: ") + c;
-  return false;
+  return UnexpectedCharacter(c, line, column);
 }
 
-bool JsonLexer::GetKeywordToken(const std::string& input,
-                                int index,
-                                int* type,
-                                std::string* value,
-                                int* count,
-                                std::string* error) const {
-  if (input.compare(index, 5, "false") == 0) {
-    *type = TYPE_FALSE;
-    *value = "false";
-    *count = 5;
-    return true;
-  } else if (input.compare(index, 4, "null") == 0) {
-    *type = TYPE_NULL;
-    *value = "null";
-    *count = 4;
-    return true;
-  } else if (input.compare(index, 4, "true") == 0) {
-    *type = TYPE_TRUE;
-    *value = "true";
-    *count = 4;
-    return true;
+StatusOr<std::unique_ptr<Token>> JsonLexer::GetKeywordToken(
+    const char* input, int line, int column) const {
+  if (strncmp(input, "false", 5) == 0) {
+    return std::unique_ptr<Token>(new Token(TYPE_FALSE, "false", line, column));
+  } else if (strncmp(input, "null", 4) == 0) {
+    return std::unique_ptr<Token>(new Token(TYPE_NULL, "null", line, column));
+  } else if (strncmp(input, "true", 4) == 0) {
+    return std::unique_ptr<Token>(new Token(TYPE_TRUE, "true", line, column));
   }
 
-  *error = "Unrecognized token";
-  return false;
+  return UnexpectedCharacter(*input, line, column);
 }
 
-bool JsonLexer::GetNumberToken(const std::string& input,
-                               int index,
-                               int* type,
-                               std::string* value,
-                               int* count,
-                               std::string* error) const {
-  const int length = input.length();
-  const int start = index;
+StatusOr<std::unique_ptr<Token>> JsonLexer::GetNumberToken(
+    const char* input, int line, int column) const {
+  const char* start = input;
 
-  if (input[index] == '-')
-    ++index;
+  if (*input == '-')
+    ++input;
 
-  if (index == length) {
-    *error = "Unexpected end of input";
-    return false;
-  } else if (!IsDigit(input[index])) {
-    *error = "Expecting digit";
-    return false;
+  RETURN_IF_ERROR(ExpectDigit(*input, line, column));
+  if (*input == '0') {
+    ++input;
+  } else {
+    for (; IsDigit(*input); ++input);
   }
 
-  if (input[index] == '0') {
-    ++index;
-    if (index < length && IsDigit(input[index])) {
-      *error = "Unexpected digit";
-      return false;
-    }
-  } else
-    for (; index < length && IsDigit(input[index]); ++index);
-
-  if (index < length && input[index] == '.') {
-    ++index;
-
-    if (index == length) {
-      *error = "Unexpected end of input";
-      return false;
-    } else if (!IsDigit(input[index])) {
-      *error = "Expecting digit";
-      return false;
-    }
-
-    for (; index < length && IsDigit(input[index]); ++index);
+  if (*input == '.') {
+    ++input;
+    RETURN_IF_ERROR(ExpectDigit(*input, line, column));
+    for (; IsDigit(*input); ++input);
   }
 
-  if (index < length && (input[index] == 'e' || input[index] == 'E')) {
-    ++index;
+  if (*input == 'e' || *input == 'E') {
+    ++input;
 
-    if (index < length && (input[index] == '-' || input[index] == '+'))
-      ++index;
+    if (*input == '-' || *input == '+')
+      ++input;
 
-    if (index == length) {
-      *error = "Unexpected end of input";
-      return false;
-    } else if (!IsDigit(input[index])) {
-      *error = "Expecting digit";
-      return false;
-    }
-
-    for (; index < length && IsDigit(input[index]); ++index);
+    RETURN_IF_ERROR(ExpectDigit(*input, line, column));
+    for (; IsDigit(*input); ++input);
   }
 
-  *type = TYPE_NUMBER;
-  *value = input.substr(start, index - start);
-  *count = index - start;
-  return true;
+  return std::unique_ptr<Token>(new Token(
+      TYPE_NUMBER, std::string(start, input - start), line, column));
 }
 
-bool JsonLexer::GetStringToken(const std::string& input,
-                               int index,
-                               int* type,
-                               std::string* value,
-                               int* count,
-                               std::string* error) const {
-  const int length = input.length();
-  const int start = index;
+StatusOr<std::unique_ptr<Token>> JsonLexer::GetStringToken(
+    const char* input, int line, int column) const {
+  const char* start = input;
   std::string str;
-
-  ++index;
+  ++input;
 
   while (true) {
-    if (index == length) {
-      *error = "Unterminated string";
-      return false;
-    }
+    RETURN_IF_ERROR(ExpectNotControl(*input, line, column));
 
-    char c = input[index];
+    char c = *input;
 
     if (c == '"') {
-      ++index;
+      ++input;
       break;
     }
 
-    if (c < ' ') {
-      *error = "Unterminated string";
-      return false;
-    }
-
     if (c == '\\') {
-      ++index;
-      if (index == length) {
-        *error = "Unterminated string";
-        return false;
-      }
+      ++input;
 
-      c = input[index];
-      if (c == 'b')
+      c = *input;
+      if (c == 'b') {
         c = '\b';
-      else if (c == 'f')
+      } else if (c == 'f') {
         c = '\f';
-      else if (c == 'n')
+      } else if (c == 'n') {
         c = '\n';
-      else if (c == 'r')
+      } else if (c == 'r') {
         c = '\r';
-      else if (c == 't')
+      } else if (c == 't') {
         c = '\t';
-      else if (c == 'u') {
+      } else if (c == 'u') {
         c = '?';
         for (int i = 0; i < 4; ++i) {
-          ++index;
-          if (index == length) {
-            *error = "Unexpected end of input";
-            return false;
-          } else if (!IsDigit(input[index])) {
-            *error = "Expecting digit";
-            return false;
-          }
+          ++input;
+          RETURN_IF_ERROR(ExpectDigit(*input, line, column));
         }
       } else if (c == '"' || c == '\\' || c == '/') {
         // Nothing to do.
       } else {
-        *error = "Unrecognized escape sequence";
-        return false;
+        return UnexpectedCharacter(c, line, column);
       }
     }
 
     str += c;
-    ++index;
+    ++input;
   }
 
-  *type = TYPE_STRING;
-  *value = str;
-  *count = index - start;
-  return true;
+  return std::unique_ptr<Token>(
+      new Token(TYPE_STRING, str, line, column, input - start));
 }

@@ -8,19 +8,19 @@ class JsonParser : public Parser {
   JsonParser(TokenStream* token_stream);
   JsonParser(const JsonParser&) = delete;
   JsonParser& operator=(const JsonParser&) = delete;
-  virtual ~JsonParser();
+  ~JsonParser() override = default;
 
-  virtual bool Parse(std::unique_ptr<const ASTNode>* root);
+  StatusOr<std::unique_ptr<ASTNode>> Parse() override;
 
  protected:
-  virtual bool ParsePrefixToken(std::unique_ptr<const Token> token,
-                                std::unique_ptr<const ASTNode>* root);
+  StatusOr<std::unique_ptr<ASTNode>> ParsePrefixToken(
+      std::unique_ptr<const Token> token) override;
 
  private:
-  bool ParseObject(std::unique_ptr<const Token> token,
-                   std::unique_ptr<const ASTNode>* root);
-  bool ParseArray(std::unique_ptr<const Token> token,
-                  std::unique_ptr<const ASTNode>* root);
+  StatusOr<std::unique_ptr<ASTNode>> ParseObject(
+      std::unique_ptr<const Token> token);
+  StatusOr<std::unique_ptr<ASTNode>> ParseArray(
+      std::unique_ptr<const Token> token);
 };
 
 #endif  // JSON_JSON_PARSER_H_

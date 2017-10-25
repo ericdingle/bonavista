@@ -5,10 +5,10 @@
 
 class JsonLexer : public Lexer {
  public:
-  JsonLexer();
+  JsonLexer() = default;
   JsonLexer(const JsonLexer&) = delete;
   JsonLexer& operator=(const JsonLexer&) = delete;
-  virtual ~JsonLexer();
+  ~JsonLexer() override = default;
 
   enum Type {
     TYPE_COLON,
@@ -24,34 +24,16 @@ class JsonLexer : public Lexer {
     TYPE_STRING
   };
 
-  virtual bool GetToken(const std::string& input,
-                        int index,
-                        int* type,
-                        std::string* value,
-                        int* count,
-                        std::string* error) const;
+  StatusOr<std::unique_ptr<Token>> GetToken(
+      const char* input, int line, int column) const override;
 
  private:
-  bool GetKeywordToken(const std::string& input,
-                       int index,
-                       int* type,
-                       std::string* value,
-                       int* count,
-                       std::string* error) const;
-
-  bool GetNumberToken(const std::string& input,
-                      int index,
-                      int* type,
-                      std::string* value,
-                      int* count,
-                      std::string* error) const;
-
-  bool GetStringToken(const std::string& input,
-                      int index,
-                      int* type,
-                      std::string* value,
-                      int* count,
-                      std::string* error) const;
+  StatusOr<std::unique_ptr<Token>> GetKeywordToken(
+      const char* input, int line, int column) const;
+  StatusOr<std::unique_ptr<Token>> GetNumberToken(
+      const char* input, int line, int column) const;
+  StatusOr<std::unique_ptr<Token>> GetStringToken(
+      const char* input, int line, int column) const;
 };
 
 #endif  // JSON_JSON_LEXER_H_

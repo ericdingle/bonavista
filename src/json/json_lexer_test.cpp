@@ -1,27 +1,39 @@
 #include "json/json_lexer.h"
 
+#include <cstring>
 #include <tuple>
 #include <vector>
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 class JsonLexerTest : public testing::Test {
  protected:
-  JsonLexer lexer_;
+  void ExpectStatus(const char* input, const std::string& message) {
+    auto status_or = lexer_.GetToken(input, 1, 1);
+    ASSERT_TRUE(status_or.error()) << "Input: " << input;
+    EXPECT_EQ(message, status_or.status().message()) << input;
+  }
 
-  std::string input_;
-  int type_;
-  std::string value_;
-  int count_;
-  std::string error_;
+  void ExpectToken(const char* input, int type, const std::string& value,
+                   int length=0) {
+    auto status_or = lexer_.GetToken(input, 1, 1);
+    ASSERT_FALSE(status_or.error()) << "Input: " << input << ". Status: " <<
+        status_or.status().ToString();
+    const auto& token = status_or.value();
+    EXPECT_EQ(type, token->type());
+    EXPECT_EQ(value, token->value());
+    if (length)
+      EXPECT_EQ(length, token->length());
+   }
+
+  JsonLexer lexer_;
 };
 
-TEST_F(JsonLexerTest, TokenizeUnknown) {
-  input_ = "blah";
-  EXPECT_FALSE(lexer_.GetToken(input_, 0, &type_, &value_, &count_, &error_));
-  EXPECT_FALSE(error_.empty());
+TEST_F(JsonLexerTest, GetTokenUnexpected) {
+  ExpectStatus(".", "Unexpected character: .");
+  ExpectStatus("blah", "Unexpected character: b");
 }
 
-TEST_F(JsonLexerTest, TokenizeOperators) {
+TEST_F(JsonLexerTest, GetTokenOperators) {
   std::vector<std::tuple<const char*, JsonLexer::Type>> test_cases = {
       std::make_tuple(":", JsonLexer::TYPE_COLON),
       std::make_tuple(",", JsonLexer::TYPE_COMMA),
@@ -32,19 +44,12 @@ TEST_F(JsonLexerTest, TokenizeOperators) {
       };
 
   for (const std::tuple<const char*, int>& test_case : test_cases) {
-    input_ = std::get<0>(test_case);
-    EXPECT_TRUE(lexer_.GetToken(input_, 0, &type_, &value_, &count_, &error_));
-    EXPECT_EQ(std::get<1>(test_case), type_);
-    EXPECT_EQ(input_, value_);
-    EXPECT_EQ(1, count_);
+    const char* input = std::get<0>(test_case);
+    ExpectToken(input, std::get<1>(test_case), input);
   }
-
-  input_ = ".";
-  EXPECT_FALSE(lexer_.GetToken(input_, 0, &type_, &value_, &count_, &error_));
-  EXPECT_FALSE(error_.empty());
 }
 
-TEST_F(JsonLexerTest, TokenizeKeyword) {
+TEST_F(JsonLexerTest, GetTokenKeyword) {
   std::vector<std::tuple<const char*, JsonLexer::Type>> test_cases = {
       std::make_tuple("false", JsonLexer::TYPE_FALSE),
       std::make_tuple("null", JsonLexer::TYPE_NULL),
@@ -52,15 +57,12 @@ TEST_F(JsonLexerTest, TokenizeKeyword) {
       };
 
   for (const std::tuple<const char*, JsonLexer::Type> test_case : test_cases) {
-    input_ = std::get<0>(test_case);
-    EXPECT_TRUE(lexer_.GetToken(input_, 0, &type_, &value_, &count_, &error_));
-    EXPECT_EQ(std::get<1>(test_case), type_);
-    EXPECT_EQ(input_, value_);
-    EXPECT_EQ(input_.length(), count_);
+    const char* input = std::get<0>(test_case);
+    ExpectToken(input, std::get<1>(test_case), input);
   }
 }
 
-TEST_F(JsonLexerTest, TokenizeNumber) {
+TEST_F(JsonLexerTest, GetTokenNumber) {
   std::vector<const char*> test_cases = {
     "0", "-0", "1", "-1", "12", "123",
     "0.1", "-0.1", "12.3", "12.34",
@@ -68,26 +70,19 @@ TEST_F(JsonLexerTest, TokenizeNumber) {
   };
 
   for (const char* test_case : test_cases) {
-    input_ = test_case;
-    EXPECT_TRUE(lexer_.GetToken(input_, 0, &type_, &value_, &count_, &error_));
-    EXPECT_EQ(JsonLexer::TYPE_NUMBER, type_);
-    EXPECT_EQ(input_, value_);
-    EXPECT_EQ(input_.length(), count_);
+    ExpectToken(test_case, JsonLexer::TYPE_NUMBER, test_case);
   }
 }
 
-TEST_F(JsonLexerTest, TokenizeNumberError) {
-  std::vector<const char*> test_cases = { "-", "01", "1.", "23e", "35E+" };
+TEST_F(JsonLexerTest, GetTokenNumberError) {
+  std::vector<const char*> test_cases = { "-", "1.", "23e", "35E+" };
 
   for (const char* test_case : test_cases) {
-    input_ = test_case;
-    error_.clear();
-    EXPECT_FALSE(lexer_.GetToken(input_, 0, &type_, &value_, &count_, &error_));
-    EXPECT_FALSE(error_.empty());
+    ExpectStatus(test_case, "Unexpected end of input");
   }
 }
 
-TEST_F(JsonLexerTest, TokenizeString) {
+TEST_F(JsonLexerTest, GetTokenString) {
   std::vector<std::tuple<const char*, const char*>> test_cases = {
       std::make_tuple("\"test\"", "test"),
       std::make_tuple("\"asdf jkl;\"", "asdf jkl;"),
@@ -103,28 +98,23 @@ TEST_F(JsonLexerTest, TokenizeString) {
   };
 
   for (const std::tuple<const char*, const char*>& test_case : test_cases) {
-    input_ = std::get<0>(test_case);
-    EXPECT_TRUE(lexer_.GetToken(input_, 0, &type_, &value_, &count_, &error_));
-    EXPECT_EQ(JsonLexer::TYPE_STRING, type_);
-    EXPECT_EQ(std::get<1>(test_case), value_);
-    EXPECT_EQ(input_.length(), count_);
+    const char* input = std::get<0>(test_case);
+    ExpectToken(input, JsonLexer::TYPE_STRING, std::get<1>(test_case),
+                strlen(input));
   }
 }
 
-TEST_F(JsonLexerTest, TokenizeStringError) {
-  std::vector<const char*> test_cases = {
-    "\"test",
-    "\"test\n",
-    "\"test\\",
-    "\"test\\a",
-    "\"test\\u12",
-    "\"test\\u123e",
+TEST_F(JsonLexerTest, GetTokenStringError) {
+  std::vector<std::tuple<const char*, const char*>> test_cases = {
+    std::make_tuple("\"test", "Unexpected end of input"),
+    std::make_tuple("\"test\n", "Unexpected character: \n"),
+    std::make_tuple("\"test\\", "Unexpected end of input"),
+    std::make_tuple("\"test\\a", "Unexpected character: a"),
+    std::make_tuple("\"test\\u12", "Unexpected end of input"),
+    std::make_tuple("\"test\\u123e", "Unexpected character: e"),
   };
 
-  for (const char* test_case : test_cases) {
-    input_ = test_case;
-    error_.clear();
-    EXPECT_FALSE(lexer_.GetToken(input_, 0, &type_, &value_, &count_, &error_));
-    EXPECT_FALSE(error_.empty());
+  for (const std::tuple<const char*, const char*>& test_case : test_cases) {
+    ExpectStatus(std::get<0>(test_case), std::get<1>(test_case));
   }
 }
