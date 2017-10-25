@@ -7,6 +7,7 @@
 #include "lexer/token_stream.h"
 #include "parser/ast_node.h"
 #include "util/status_or.h"
+#include "third_party/googletest/googletest/include/gtest/gtest_prod.h"
 
 class Parser {
  public:
@@ -20,6 +21,7 @@ class Parser {
   bool HasInput() const;
 
  protected:
+  static Status ExpectToken(const Token& token, int type);
   static Status UnexpectedToken(const Token& token);
 
   StatusOr<std::unique_ptr<Token>> GetNextToken();
@@ -36,6 +38,9 @@ class Parser {
 
  private:
   TokenStream* const token_stream_;
+
+  FRIEND_TEST(ParserTest, ExpectToken);
+  FRIEND_TEST(ParserTest, UnexpectedToken);
 };
 
 #endif  // PARSER_PARSER_H_

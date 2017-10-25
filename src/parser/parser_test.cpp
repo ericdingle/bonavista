@@ -22,7 +22,7 @@ class TestLexer : public Lexer {
                                               line, column));
     }
 
-    return UnrecognizedToken(c, line, column);
+    return UnexpectedCharacter(c, line, column);
   }
 };
 
@@ -101,6 +101,24 @@ class ParserTest : public testing::Test {
   std::unique_ptr<Parser> parser_;
 };
 
+TEST_F(ParserTest, ExpectToken) {
+  Token token(1, "a", 2, 3);
+  Status s1 = Parser::ExpectToken(token, 1);
+  EXPECT_FALSE(s1.error());
+  Status s2 = Parser::ExpectToken(token, 2);
+  EXPECT_TRUE(s2.error());
+  EXPECT_EQ("Unexpected token: a", s2.message());
+}
+
+TEST_F(ParserTest, UnexpectedToken) {
+  Token token(1, "a", 2, 3);
+  Status s = Parser::UnexpectedToken(token);
+  EXPECT_TRUE(s.error());
+  EXPECT_EQ("Unexpected token: a", s.message());
+  EXPECT_EQ(2, s.line());
+  EXPECT_EQ(3, s.column());
+}
+
 TEST_F(ParserTest, Empty) {
   Init("");
   EXPECT_FALSE(parser_->HasInput());
@@ -112,9 +130,9 @@ TEST_F(ParserTest, NotEmpty) {
   EXPECT_TRUE(parser_->HasInput());
 }
 
-TEST_F(ParserTest, BadToken) {
+TEST_F(ParserTest, UnexpectedCharacter) {
   Init("a");
-  ExpectStatus(parser_->Parse(), "Unrecognized token: a");
+  ExpectStatus(parser_->Parse(), "Unexpected character: a");
 }
 
 TEST_F(ParserTest, Prefix) {

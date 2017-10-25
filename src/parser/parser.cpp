@@ -28,6 +28,10 @@ bool Parser::HasInput() const {
       token_stream_->HasInput();
 }
 
+Status Parser::ExpectToken(const Token& token, int type) {
+  return token.IsType(type) ? Status() : UnexpectedToken(token);
+}
+
 Status Parser::UnexpectedToken(const Token& token) {
   return Status("Unexpected token: " + token.value(), token.line(), token.column());
 }
