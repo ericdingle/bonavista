@@ -3,18 +3,18 @@
 
 #include <memory>
 #include <string>
+#include "lexer/token.h"
 #include "util/status_or.h"
-
-class Token;
+#include "third_party/googletest/googletest/include/gtest/gtest_prod.h"
 
 class Lexer {
  public:
   static const int TYPE_END_OF_INPUT;
 
-  Lexer();
+  Lexer() = default;
   Lexer(const Lexer&) = delete;
   Lexer& operator=(const Lexer&) = delete;
-  virtual ~Lexer();
+  virtual ~Lexer() = default;
 
   virtual StatusOr<std::unique_ptr<Token>> GetToken(
       const char* input, int line, int column) const = 0;
@@ -23,7 +23,19 @@ class Lexer {
   static bool IsAlpha(char c);
   static bool IsDigit(char c);
 
-  static Status UnrecognizedToken(char c, int line, int column);
+  static Status ExpectDigit(char c, int line, int column);
+  static Status ExpectNotControl(char c, int line, int column);
+  static Status ExpectNotNull(char c, int line, int column);
+
+  static Status UnexpectedCharacter(char c, int line, int column);
+
+ private:
+  FRIEND_TEST(LexerTest, IsAlpha);
+  FRIEND_TEST(LexerTest, IsDigit);
+  FRIEND_TEST(LexerTest, ExpectDigit);
+  FRIEND_TEST(LexerTest, ExpectNotControl);
+  FRIEND_TEST(LexerTest, ExpectNotNull);
+  FRIEND_TEST(LexerTest, UnexpectedCharacter);
 };
 
 #endif  // LEXER_LEXER_H_

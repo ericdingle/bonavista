@@ -38,9 +38,8 @@ StatusOr<std::unique_ptr<Token>> TokenStream::GetNextToken() {
       auto token, lexer_->GetToken(input_.c_str() + index_, line_, column_));
 
   // Increment the index and position.
-  int length = static_cast<int>(token->value().length());
-  index_ += length;
-  column_ += length;
+  index_ += token->length();
+  column_ += token->length();
 
   return std::move(token);
 }
