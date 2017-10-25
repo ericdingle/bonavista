@@ -4,9 +4,9 @@
 #include "json/json_lexer.h"
 #include "json/json_parser.h"
 #include "lexer/token_stream.h"
-#include "parser/ast_node.h"
+#include "parser/node.h"
 
-void PrintJsonTree(const ASTNode* node, int level);
+void PrintJsonTree(const Node* node, int level);
 
 int main(int argc, char* argv[]) {
   if (argc != 2) {
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
   TokenStream stream(&lexer, buffer.c_str());
 
   JsonParser parser(&stream);
-  StatusOr<std::unique_ptr<ASTNode>> status_or = parser.Parse();
+  StatusOr<std::unique_ptr<Node>> status_or = parser.Parse();
   if (!status_or.ok()) {
     printf("Error: %s\n", status_or.status().ToString().c_str());
     return 1;
@@ -34,12 +34,12 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 
-void PrintJsonTree(const ASTNode* node, int level) {
+void PrintJsonTree(const Node* node, int level) {
   std::string indent(2 * level, ' ');
 
   if (node->token().IsType(JsonLexer::TYPE_LEFT_BRACE)) {
     printf("{");
-    const std::vector<std::unique_ptr<const ASTNode> >& children = node->children();
+    const std::vector<std::unique_ptr<const Node> >& children = node->children();
     const char* comma = "";
     for(uint i = 0; i < children.size(); i += 2) {
       printf("%s\n%s  %s: ", comma, indent.c_str(),
@@ -53,7 +53,7 @@ void PrintJsonTree(const ASTNode* node, int level) {
 
   if (node->token().IsType(JsonLexer::TYPE_LEFT_BRACKET)) {
     printf("[");
-    const std::vector<std::unique_ptr<const ASTNode> >& children = node->children();
+    const std::vector<std::unique_ptr<const Node> >& children = node->children();
     const char* comma = "";
     for(uint i = 0; i < children.size(); ++i) {
       printf("%s\n%s  ", comma, indent.c_str());

@@ -10,16 +10,16 @@ class JsonParser : public Parser {
   JsonParser& operator=(const JsonParser&) = delete;
   ~JsonParser() override = default;
 
-  StatusOr<std::unique_ptr<ASTNode>> Parse() override;
+  StatusOr<std::unique_ptr<Node>> Parse() override;
 
  protected:
-  StatusOr<std::unique_ptr<ASTNode>> ParsePrefixToken(
+  StatusOr<std::unique_ptr<Node>> ParsePrefixToken(
       std::unique_ptr<const Token> token) override;
 
  private:
-  StatusOr<std::unique_ptr<ASTNode>> ParseObject(
+  StatusOr<std::unique_ptr<Node>> ParseObject(
       std::unique_ptr<const Token> token);
-  StatusOr<std::unique_ptr<ASTNode>> ParseArray(
+  StatusOr<std::unique_ptr<Node>> ParseArray(
       std::unique_ptr<const Token> token);
 };
 

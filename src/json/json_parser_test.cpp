@@ -2,7 +2,7 @@
 
 #include "lexer/token_stream.h"
 #include "json/json_lexer.h"
-#include "parser/ast_node.h"
+#include "parser/node.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 class JsonParserTest : public testing::Test {

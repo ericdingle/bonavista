@@ -5,7 +5,7 @@
 #include <string>
 #include "lexer/token.h"
 #include "lexer/token_stream.h"
-#include "parser/ast_node.h"
+#include "parser/node.h"
 #include "util/status_or.h"
 #include "third_party/googletest/googletest/include/gtest/gtest_prod.h"
 
@@ -16,7 +16,7 @@ class Parser {
   Parser& operator=(const Parser&) = delete;
   virtual ~Parser();
 
-  virtual StatusOr<std::unique_ptr<ASTNode>> Parse();
+  virtual StatusOr<std::unique_ptr<Node>> Parse();
 
   bool HasInput() const;
 
@@ -25,14 +25,14 @@ class Parser {
   static Status UnexpectedToken(const Token& token);
 
   StatusOr<std::unique_ptr<Token>> GetNextToken();
-  StatusOr<std::unique_ptr<ASTNode>> ParseExpression(int binding_power);
+  StatusOr<std::unique_ptr<Node>> ParseExpression(int binding_power);
   Status ConsumeToken(int type);
 
   virtual int GetBindingPower(int type) const;
-  virtual StatusOr<std::unique_ptr<ASTNode>> ParsePrefixToken(
+  virtual StatusOr<std::unique_ptr<Node>> ParsePrefixToken(
       std::unique_ptr<const Token> token) = 0;
-  virtual StatusOr<std::unique_ptr<ASTNode>> ParseInfixToken(
-      std::unique_ptr<const Token> token, std::unique_ptr<const ASTNode> left);
+  virtual StatusOr<std::unique_ptr<Node>> ParseInfixToken(
+      std::unique_ptr<const Token> token, std::unique_ptr<const Node> left);
 
   std::unique_ptr<Token> look_ahead_token_;
 

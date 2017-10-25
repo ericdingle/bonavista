@@ -8,7 +8,7 @@ Parser::Parser(TokenStream* token_stream) : token_stream_(token_stream) {
 Parser::~Parser() {
 }
 
-StatusOr<std::unique_ptr<ASTNode>> Parser::Parse() {
+StatusOr<std::unique_ptr<Node>> Parser::Parse() {
   if (!look_ahead_token_) {
     ASSIGN_OR_RETURN(auto token, GetNextToken());
   }
@@ -42,7 +42,7 @@ StatusOr<std::unique_ptr<Token>> Parser::GetNextToken() {
   return std::move(token);
 }
 
-StatusOr<std::unique_ptr<ASTNode>> Parser::ParseExpression(int binding_power) {
+StatusOr<std::unique_ptr<Node>> Parser::ParseExpression(int binding_power) {
   ASSIGN_OR_RETURN(auto token, GetNextToken());
   ASSIGN_OR_RETURN(auto left, ParsePrefixToken(std::move(token)));
 
@@ -68,7 +68,7 @@ int Parser::GetBindingPower(int type) const {
   return 0;
 }
 
-StatusOr<std::unique_ptr<ASTNode>> Parser::ParseInfixToken(
-    std::unique_ptr<const Token> token, std::unique_ptr<const ASTNode> left) {
+StatusOr<std::unique_ptr<Node>> Parser::ParseInfixToken(
+    std::unique_ptr<const Token> token, std::unique_ptr<const Node> left) {
   return UnexpectedToken(*token);
 }

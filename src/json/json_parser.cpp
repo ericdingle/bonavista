@@ -2,12 +2,12 @@
 
 #include <vector>
 #include "json/json_lexer.h"
-#include "parser/ast_node.h"
+#include "parser/node.h"
 
 JsonParser::JsonParser(TokenStream* token_stream) : Parser(token_stream) {
 }
 
-StatusOr<std::unique_ptr<ASTNode>> JsonParser::Parse() {
+StatusOr<std::unique_ptr<Node>> JsonParser::Parse() {
   ASSIGN_OR_RETURN(auto root, Parser::Parse());
 
   if (HasInput())
@@ -16,7 +16,7 @@ StatusOr<std::unique_ptr<ASTNode>> JsonParser::Parse() {
   return std::move(root);
 }
 
-StatusOr<std::unique_ptr<ASTNode>> JsonParser::ParsePrefixToken(
+StatusOr<std::unique_ptr<Node>> JsonParser::ParsePrefixToken(
     std::unique_ptr<const Token> token) {
   if (token->IsType(JsonLexer::TYPE_LEFT_BRACE))
     return ParseObject(std::move(token));
@@ -28,19 +28,19 @@ StatusOr<std::unique_ptr<ASTNode>> JsonParser::ParsePrefixToken(
       token->IsType(JsonLexer::TYPE_NUMBER) ||
       token->IsType(JsonLexer::TYPE_STRING) ||
       token->IsType(JsonLexer::TYPE_TRUE))
-    return std::unique_ptr<ASTNode>(new ASTNode(std::move(token)));
+    return std::unique_ptr<Node>(new Node(std::move(token)));
 
   return UnexpectedToken(*token);
 }
 
-StatusOr<std::unique_ptr<ASTNode>> JsonParser::ParseObject(
+StatusOr<std::unique_ptr<Node>> JsonParser::ParseObject(
     std::unique_ptr<const Token> token) {
   // Implements:
   //  object -> '{' pairs '}'
   //  pair -> string ':' value
   //  pairs -> pair more_pairs | E
   //  more_pairs -> ',' pair more_pairs | E
-  std::unique_ptr<ASTNode> node(new ASTNode(std::move(token)));
+  std::unique_ptr<Node> node(new Node(std::move(token)));
 
   if (!look_ahead_token_->IsType(JsonLexer::TYPE_RIGHT_BRACE)) {
     while (true) {
@@ -64,13 +64,13 @@ StatusOr<std::unique_ptr<ASTNode>> JsonParser::ParseObject(
   return std::move(node);
 }
 
-StatusOr<std::unique_ptr<ASTNode>> JsonParser::ParseArray(
+StatusOr<std::unique_ptr<Node>> JsonParser::ParseArray(
     std::unique_ptr<const Token> token) {
   // Implements:
   //   array -> '[' values ']'
   //   values -> value more_values | E
   //   more_values -> ',' value more_values | E
-  std::unique_ptr<ASTNode> node(new ASTNode(std::move(token)));
+  std::unique_ptr<Node> node(new Node(std::move(token)));
 
   if (!look_ahead_token_->IsType(JsonLexer::TYPE_RIGHT_BRACKET)) {
     while (true) {

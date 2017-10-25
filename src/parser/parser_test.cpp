@@ -2,7 +2,7 @@
 
 #include "lexer/lexer.h"
 #include "lexer/token_stream.h"
-#include "parser/ast_node.h"
+#include "parser/node.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 class TestLexer : public Lexer {
@@ -36,10 +36,10 @@ class TestParser : public Parser {
     return type == TestLexer::TYPE_PLUS ? 10 : 0;
   }
 
-  StatusOr<std::unique_ptr<ASTNode>> ParsePrefixToken(
+  StatusOr<std::unique_ptr<Node>> ParsePrefixToken(
       std::unique_ptr<const Token> token) override {
     if (token->IsType(TestLexer::TYPE_DIGIT)) {
-      auto node = std::unique_ptr<ASTNode>(new ASTNode(std::move(token)));
+      auto node = std::unique_ptr<Node>(new Node(std::move(token)));
 
       // Weird behavior only for the test.
       if (node->token().value() == "0") {
@@ -52,11 +52,11 @@ class TestParser : public Parser {
     return UnexpectedToken(*token);
   }
 
-  StatusOr<std::unique_ptr<ASTNode>> ParseInfixToken(
-      std::unique_ptr<const Token> token, std::unique_ptr<const ASTNode> left)
+  StatusOr<std::unique_ptr<Node>> ParseInfixToken(
+      std::unique_ptr<const Token> token, std::unique_ptr<const Node> left)
       override {
     if (token->IsType(TestLexer::TYPE_PLUS)) {
-      auto node = std::unique_ptr<ASTNode>(new ASTNode(std::move(token)));
+      auto node = std::unique_ptr<Node>(new Node(std::move(token)));
       node->AddChild(std::move(left));
 
       ASSIGN_OR_RETURN(auto right, ParseExpression(10));
@@ -76,13 +76,13 @@ class ParserTest : public testing::Test {
     parser_.reset(new TestParser(stream_.get()));
   }
 
-  void ExpectStatus(const StatusOr<std::unique_ptr<ASTNode>>& status_or,
+  void ExpectStatus(const StatusOr<std::unique_ptr<Node>>& status_or,
                     const std::string& message) {
     EXPECT_FALSE(status_or.ok());
     EXPECT_EQ(message, status_or.status().message());
   }
 
-  void ExpectNode(const StatusOr<std::unique_ptr<ASTNode>>& status_or,
+  void ExpectNode(const StatusOr<std::unique_ptr<Node>>& status_or,
                   int type, int num_children) {
     EXPECT_TRUE(status_or.ok());
     const auto& node = status_or.value();
@@ -90,7 +90,7 @@ class ParserTest : public testing::Test {
     EXPECT_EQ(num_children, node->children().size());
   }
 
-  void ExpectNode(const StatusOr<std::unique_ptr<ASTNode>>& status_or,
+  void ExpectNode(const StatusOr<std::unique_ptr<Node>>& status_or,
                   int type, const std::string& value, int num_children) {
     ExpectNode(status_or, type, num_children);
     EXPECT_EQ(value, status_or.value()->token().value());
