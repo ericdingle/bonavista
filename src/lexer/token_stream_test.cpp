@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "lexer/lexer.h"
+#include "util/status_test_macros.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 class TestLexer : public Lexer {
@@ -26,7 +27,7 @@ class TokenStreamTest : public testing::Test {
   void ExpectToken(TokenStream* token_stream, int type, const std::string& value,
                    int line, int column) {
     auto status_or = token_stream->GetNextToken();
-    EXPECT_TRUE(status_or.ok());
+    EXPECT_OK(status_or);
     auto token = status_or.value();
     EXPECT_EQ(type, token->type());
     EXPECT_EQ(value, token->value());

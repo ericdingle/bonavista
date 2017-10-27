@@ -1,18 +1,12 @@
-#include "json/json_lexer.h"
-
 #include <cstring>
 #include <tuple>
 #include <vector>
+#include "json/json_lexer.h"
+#include "util/status_test_macros.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 class JsonLexerTest : public testing::Test {
  protected:
-  void ExpectStatus(const char* input, const std::string& message) {
-    auto status_or = lexer_.GetToken(input, 1, 1);
-    ASSERT_FALSE(status_or.ok()) << "Input: " << input;
-    EXPECT_EQ(message, status_or.status().message()) << input;
-  }
-
   void ExpectToken(const char* input, int type, const std::string& value,
                    int length=0) {
     auto status_or = lexer_.GetToken(input, 1, 1);
@@ -29,8 +23,10 @@ class JsonLexerTest : public testing::Test {
 };
 
 TEST_F(JsonLexerTest, GetTokenUnexpected) {
-  ExpectStatus(".", "Unexpected character: .");
-  ExpectStatus("blah", "Unexpected character: b");
+  EXPECT_STATUS(lexer_.GetToken(".", 1, 1).status(),
+                "Unexpected character: .", 1, 1);
+  EXPECT_STATUS(lexer_.GetToken("blah", 1, 1).status(),
+                "Unexpected character: b", 1, 1);
 }
 
 TEST_F(JsonLexerTest, GetTokenOperators) {
@@ -78,7 +74,8 @@ TEST_F(JsonLexerTest, GetTokenNumberError) {
   std::vector<const char*> test_cases = { "-", "1.", "23e", "35E+" };
 
   for (const char* test_case : test_cases) {
-    ExpectStatus(test_case, "Unexpected end of input");
+    EXPECT_STATUS(lexer_.GetToken(test_case, 1, 1).status(),
+                  "Unexpected end of input", 1, 1);
   }
 }
 
@@ -115,6 +112,7 @@ TEST_F(JsonLexerTest, GetTokenStringError) {
   };
 
   for (const std::tuple<const char*, const char*>& test_case : test_cases) {
-    ExpectStatus(std::get<0>(test_case), std::get<1>(test_case));
+    EXPECT_STATUS(lexer_.GetToken(std::get<0>(test_case), 1, 1).status(),
+                  std::get<1>(test_case), 1, 1);
   }
 }

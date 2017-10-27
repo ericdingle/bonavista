@@ -1,42 +1,32 @@
-#include "json/json_parser.h"
-
 #include "lexer/token_stream.h"
 #include "json/json_lexer.h"
+#include "json/json_parser.h"
 #include "parser/node.h"
+#include "util/status_test_macros.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 class JsonParserTest : public testing::Test {
  protected:
-  void CreateParser(const char* input) {
-    stream_.reset(new TokenStream(&lexer_, input));
-    parser_.reset(new JsonParser(stream_.get()));
-  }
-
-  void ExpectStatus(const char* input, const std::string& message) {
-    CreateParser(input);
-    auto status_or = parser_->Parse();
-    EXPECT_FALSE(status_or.ok());
-    EXPECT_EQ(message, status_or.status().message());
+  StatusOr<std::unique_ptr<Node>> Parse(const char* input) {
+    JsonLexer lexer;
+    TokenStream stream(&lexer, input);
+    JsonParser parser(&stream);
+    return parser.Parse();
   }
 
   void ExpectToken(const char* input, int type) {
-    CreateParser(input);
-    auto status_or = parser_->Parse();
+    auto status_or = Parse(input);
     ASSERT_TRUE(status_or.ok()) << status_or.status().ToString();
     EXPECT_EQ(type, status_or.value()->token().type());
   }
-
-  JsonLexer lexer_;
-  std::unique_ptr<TokenStream> stream_;
-  std::unique_ptr<Parser> parser_;
 };
 
 TEST_F(JsonParserTest, ParseEmpty) {
-  ExpectStatus("", "Unexpected token: (end of input)");
+  EXPECT_STATUS(Parse("").status(), "Unexpected token: (end of input)", 1, 1);
 }
 
 TEST_F(JsonParserTest, ParseUnknown) {
-  ExpectStatus("blah", "Unexpected character: b");
+  EXPECT_STATUS(Parse("blah").status(), "Unexpected character: b", 1, 1);
 }
 
 TEST_F(JsonParserTest, ParsePrimitive) {
@@ -50,8 +40,7 @@ TEST_F(JsonParserTest, ParsePrimitive) {
 TEST_F(JsonParserTest, ParseObject) {
   ExpectToken("{}", JsonLexer::TYPE_LEFT_BRACE);
 
-  CreateParser("{\"a\": 1, \"b\": false}");
-  auto status_or = parser_->Parse();
+  auto status_or = Parse("{\"a\": 1, \"b\": false}");
   EXPECT_TRUE(status_or.ok());
   const auto& root = status_or.value();
   EXPECT_EQ(JsonLexer::TYPE_LEFT_BRACE, root->token().type());
@@ -65,18 +54,18 @@ TEST_F(JsonParserTest, ParseObject) {
 }
 
 TEST_F(JsonParserTest, ParseObjectError) {
-  ExpectStatus("{, \"a\": 1}", "Unexpected token: ,");
-  ExpectStatus("{1: false}", "Unexpected token: 1");
-  ExpectStatus("{\"a\", false}", "Unexpected token: ,");
-  ExpectStatus("{\"a\": }", "Unexpected token: }");
-  ExpectStatus("{\"a\": false", "Unexpected token: (end of input)");
+  EXPECT_STATUS(Parse("{, \"a\": 1}").status(), "Unexpected token: ,", 1, 2);
+  EXPECT_STATUS(Parse("{1: false}").status(), "Unexpected token: 1", 1, 2);
+  EXPECT_STATUS(Parse("{\"a\", false}").status(), "Unexpected token: ,", 1, 5);
+  EXPECT_STATUS(Parse("{\"a\": }").status(), "Unexpected token: }", 1, 7);
+  EXPECT_STATUS(Parse("{\"a\": false").status(),
+                "Unexpected token: (end of input)", 1, 12);
 }
 
 TEST_F(JsonParserTest, ParseArray) {
   ExpectToken("[]", JsonLexer::TYPE_LEFT_BRACKET);
 
-  CreateParser("[1, false, \"test\"]");
-  auto status_or = parser_->Parse();
+  auto status_or = Parse("[1, false, \"test\"]");
   EXPECT_TRUE(status_or.ok());
   const auto& root = status_or.value();
   EXPECT_EQ(JsonLexer::TYPE_LEFT_BRACKET, root->token().type());
@@ -89,11 +78,12 @@ TEST_F(JsonParserTest, ParseArray) {
 }
 
 TEST_F(JsonParserTest, ParseArrayError) {
-  ExpectStatus("[, false]", "Unexpected token: ,");
-  ExpectStatus("[1, false, null", "Unexpected token: (end of input)");
+  EXPECT_STATUS(Parse("[, false]").status(), "Unexpected token: ,", 1, 2);
+  EXPECT_STATUS(Parse("[1, false, null").status(),
+                "Unexpected token: (end of input)", 1, 16);
 }
 
 TEST_F(JsonParserTest, ParseMultipleExpressions) {
-  ExpectStatus("1 false", "Unexpected token: false");
-  ExpectStatus("1 blah", "Unexpected character: b");
+  EXPECT_STATUS(Parse("1 false").status(), "Unexpected token: false", 1, 3);
+  EXPECT_STATUS(Parse("1 blah").status(), "Unexpected character: b", 1, 3);
 }

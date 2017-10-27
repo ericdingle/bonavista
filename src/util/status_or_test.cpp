@@ -1,26 +1,24 @@
 #include <memory>
 #include "util/status_or.h"
+#include "util/status_test_macros.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 TEST(StatusOrTest, Status) {
   StatusOr<int> status_or(Status("test", 1, 1));
-  EXPECT_FALSE(status_or.ok());
-  const Status& status = status_or.status();
-  EXPECT_EQ("test", status.message());
+  EXPECT_NOT_OK(status_or);
+  EXPECT_STATUS(status_or.status(), "test", 1, 1);
 }
 
 TEST(StatusOrTest, ValuePOD) {
   const StatusOr<int> status_or(1);
-  EXPECT_TRUE(status_or.ok());
-  int a = status_or.value();
-  EXPECT_EQ(1, a);
+  EXPECT_OK(status_or);
+  EXPECT_EQ(1, status_or.value());
 }
 
 TEST(StatusOrTest, ValueUniquePtr) {
   StatusOr<std::unique_ptr<int>> status_or(std::unique_ptr<int>(new int(1)));
-  EXPECT_TRUE(status_or.ok());
-  std::unique_ptr<int> i = status_or.value();
-  EXPECT_EQ(1, *i);
+  EXPECT_OK(status_or);
+  EXPECT_EQ(1, *status_or.value());
 }
 
 TEST(StatusOrTest, AssignOrReturnStatus) {
@@ -33,5 +31,5 @@ TEST(StatusOrTest, AssignOrReturnStatus) {
     (void)j;  // Fix unused warning.
     return Status("no", 1, 1);
   };
-  EXPECT_EQ("yes", func().message());
+  EXPECT_STATUS(func(), "yes", 1, 1);
 }

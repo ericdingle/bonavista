@@ -18,12 +18,12 @@ class StatusOr {
   ~StatusOr() = default;
 
   bool ok() const;
-  const Status& status() const;
-  const Value& value() const;
-  Value&& value();
+  const Status& status() const { return status_; }
+  const Value& value() const { return value_; }
+  Value&& value() { return std::move(value_); }
 
  private:
-  Status status_;
+  const Status status_;
   Value value_;
 };
 
@@ -52,21 +52,6 @@ inline StatusOr<Value>::StatusOr(StatusOr&& s)
 template <typename Value>
 inline bool StatusOr<Value>::ok() const {
   return status_.ok();
-}
-
-template <typename Value>
-inline const Status& StatusOr<Value>::status() const {
-  return status_;
-}
-
-template <typename Value>
-inline const Value& StatusOr<Value>::value() const {
-  return value_;
-}
-
-template <typename Value>
-inline Value&& StatusOr<Value>::value() {
-  return std::move(value_);
 }
 
 #define TOKEN_CONCAT_IMPL(a, b) a##b

@@ -3,6 +3,7 @@
 #include "lexer/lexer.h"
 #include "lexer/token_stream.h"
 #include "parser/node.h"
+#include "util/status_test_macros.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 class TestLexer : public Lexer {
@@ -14,22 +15,19 @@ class TestLexer : public Lexer {
 
   StatusOr<std::unique_ptr<Token>> GetToken(
       const char* input, int line, int column) const override {
-    char c = input[0];
-    if (c == '+') {
+    if (*input == '+') {
       return std::unique_ptr<Token>(new Token(TYPE_PLUS, "+", line, column));
-    } else if (IsDigit(c)) {
-      return std::unique_ptr<Token>(new Token(TYPE_DIGIT, std::string(1, c),
+    } else if (IsDigit(*input)) {
+      return std::unique_ptr<Token>(new Token(TYPE_DIGIT, std::string(1, *input),
                                               line, column));
     }
-
-    return UnexpectedCharacter(c, line, column);
+    return UnexpectedCharacter(*input, line, column);
   }
 };
 
 class TestParser : public Parser {
  public:
-  TestParser(TokenStream* token_stream) : Parser(token_stream) {
-  }
+  using Parser::Parser;
 
  protected:
   int GetBindingPower(int type) const override {
@@ -48,7 +46,6 @@ class TestParser : public Parser {
 
       return std::move(node);
     }
-
     return UnexpectedToken(*token);
   }
 
@@ -64,22 +61,17 @@ class TestParser : public Parser {
 
       return std::move(node);
     }
-
     return UnexpectedToken(*token);
   }
 };
 
 class ParserTest : public testing::Test {
  protected:
-  void Init(const char* input) {
-    stream_.reset(new TokenStream(&lexer_, input));
-    parser_.reset(new TestParser(stream_.get()));
-  }
-
-  void ExpectStatus(const StatusOr<std::unique_ptr<Node>>& status_or,
-                    const std::string& message) {
-    EXPECT_FALSE(status_or.ok());
-    EXPECT_EQ(message, status_or.status().message());
+  StatusOr<std::unique_ptr<Node>> Parse(const char* input) {
+    TestLexer lexer;
+    TokenStream stream(&lexer, input);
+    TestParser parser(&stream);
+    return parser.Parse();
   }
 
   void ExpectNode(const StatusOr<std::unique_ptr<Node>>& status_or,
@@ -95,82 +87,59 @@ class ParserTest : public testing::Test {
     ExpectNode(status_or, type, num_children);
     EXPECT_EQ(value, status_or.value()->token().value());
   }
-
-  TestLexer lexer_;
-  std::unique_ptr<TokenStream> stream_;
-  std::unique_ptr<Parser> parser_;
 };
 
 TEST_F(ParserTest, ExpectToken) {
   Token token(1, "a", 2, 3);
-  Status s1 = Parser::ExpectToken(token, 1);
-  EXPECT_TRUE(s1.ok());
-  Status s2 = Parser::ExpectToken(token, 2);
-  EXPECT_FALSE(s2.ok());
-  EXPECT_EQ("Unexpected token: a", s2.message());
+  EXPECT_OK(Parser::ExpectToken(token, 1));
+  EXPECT_STATUS(Parser::ExpectToken(token, 2), "Unexpected token: a", 2, 3);
 }
 
 TEST_F(ParserTest, UnexpectedToken) {
   Token token(1, "a", 2, 3);
-  Status s = Parser::UnexpectedToken(token);
-  EXPECT_FALSE(s.ok());
-  EXPECT_EQ("Unexpected token: a", s.message());
-  EXPECT_EQ(2, s.line());
-  EXPECT_EQ(3, s.column());
+  EXPECT_STATUS(Parser::UnexpectedToken(token), "Unexpected token: a", 2, 3);
 }
 
 TEST_F(ParserTest, Empty) {
-  Init("");
-  EXPECT_FALSE(parser_->HasInput());
-  ExpectStatus(parser_->Parse(), "Unexpected token: (end of input)");
-}
-
-TEST_F(ParserTest, NotEmpty) {
-  Init("a");
-  EXPECT_TRUE(parser_->HasInput());
+  EXPECT_STATUS(Parse("").status(), "Unexpected token: (end of input)", 1, 1);
 }
 
 TEST_F(ParserTest, UnexpectedCharacter) {
-  Init("a");
-  ExpectStatus(parser_->Parse(), "Unexpected character: a");
+  EXPECT_STATUS(Parse("a").status(), "Unexpected character: a", 1, 1);
 }
 
 TEST_F(ParserTest, Prefix) {
-  Init("1");
-  ExpectNode(parser_->Parse(), TestLexer::TYPE_DIGIT, 0);
+  ExpectNode(Parse("1"), TestLexer::TYPE_DIGIT, 0);
 }
 
 TEST_F(ParserTest, PrefixError) {
-  Init("+");
-  ExpectStatus(parser_->Parse(), "Unexpected token: +");
+  EXPECT_STATUS(Parse("+").status(), "Unexpected token: +", 1, 1);
 }
 
 TEST_F(ParserTest, Infix) {
-  Init("1+2");
-  ExpectNode(parser_->Parse(), TestLexer::TYPE_PLUS, 2);
+  ExpectNode(Parse("1+2"), TestLexer::TYPE_PLUS, 2);
 }
 
 TEST_F(ParserTest, InfixError) {
-  Init("1+");
-  ExpectStatus(parser_->Parse(), "Unexpected token: (end of input)");
+  EXPECT_STATUS(Parse("1+").status(), "Unexpected token: (end of input)", 1, 3);
 }
 
 TEST_F(ParserTest, ConsumeToken) {
-  Init("01");
-  ExpectNode(parser_->Parse(), TestLexer::TYPE_DIGIT, "0", 0);
+  ExpectNode(Parse("01"), TestLexer::TYPE_DIGIT, "0", 0);
 }
 
 TEST_F(ParserTest, ConsumeTokenError) {
-  Init("0");
-  ExpectStatus(parser_->Parse(), "Unexpected token: (end of input)");
+  EXPECT_STATUS(Parse("0").status(), "Unexpected token: (end of input)", 1, 2);
 }
 
 TEST_F(ParserTest, ParseMultiple) {
-  Init("1 1 1");
+  TestLexer lexer;
+  TokenStream stream(&lexer, "1 1 1");
+  TestParser parser(&stream);
 
   for (int i = 0; i < 3; ++i) {
-    ExpectNode(parser_->Parse(), TestLexer::TYPE_DIGIT, "1", 0);
+    ExpectNode(parser.Parse(), TestLexer::TYPE_DIGIT, "1", 0);
   }
 
-  ExpectStatus(parser_->Parse(), "Unexpected token: (end of input)");
+  EXPECT_STATUS(parser.Parse().status(), "Unexpected token: (end of input)", 1, 6);
 }
