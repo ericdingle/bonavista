@@ -8,7 +8,7 @@ class Token {
   Token(int type, char c, int line, int column);
   Token(int type, const std::string& value, int line, int column, int length=0);
 
-  Token(const Token&) = delete;
+  Token(const Token&) = default;
   Token& operator=(const Token&) = delete;
   ~Token();
 

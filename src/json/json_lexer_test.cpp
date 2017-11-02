@@ -2,23 +2,12 @@
 #include <tuple>
 #include <vector>
 #include "json/json_lexer.h"
+#include "lexer/token_test_macros.h"
 #include "util/status_test_macros.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 class JsonLexerTest : public testing::Test {
  protected:
-  void ExpectToken(const char* input, int type, const std::string& value,
-                   int length=0) {
-    auto status_or = lexer_.GetToken(input, 1, 1);
-    ASSERT_TRUE(status_or.ok()) << "Input: " << input << ". Status: " <<
-        status_or.status().ToString();
-    const auto& token = status_or.value();
-    EXPECT_EQ(type, token->type());
-    EXPECT_EQ(value, token->value());
-    if (length)
-      EXPECT_EQ(length, token->length());
-   }
-
   JsonLexer lexer_;
 };
 
@@ -41,7 +30,8 @@ TEST_F(JsonLexerTest, GetTokenOperators) {
 
   for (const std::tuple<const char*, int>& test_case : test_cases) {
     const char* input = std::get<0>(test_case);
-    ExpectToken(input, std::get<1>(test_case), input);
+    EXPECT_TOKEN(*lexer_.GetToken(input, 1, 1).value(), std::get<1>(test_case),
+                 input, 1, 1);
   }
 }
 
@@ -54,7 +44,8 @@ TEST_F(JsonLexerTest, GetTokenKeyword) {
 
   for (const std::tuple<const char*, JsonLexer::Type> test_case : test_cases) {
     const char* input = std::get<0>(test_case);
-    ExpectToken(input, std::get<1>(test_case), input);
+    EXPECT_TOKEN(*lexer_.GetToken(input, 1, 1).value(), std::get<1>(test_case),
+                 input, 1, 1);
   }
 }
 
@@ -66,7 +57,8 @@ TEST_F(JsonLexerTest, GetTokenNumber) {
   };
 
   for (const char* test_case : test_cases) {
-    ExpectToken(test_case, JsonLexer::TYPE_NUMBER, test_case);
+    EXPECT_TOKEN(*lexer_.GetToken(test_case, 1, 1).value(),
+                 JsonLexer::TYPE_NUMBER, test_case, 1, 1);
   }
 }
 
@@ -96,8 +88,9 @@ TEST_F(JsonLexerTest, GetTokenString) {
 
   for (const std::tuple<const char*, const char*>& test_case : test_cases) {
     const char* input = std::get<0>(test_case);
-    ExpectToken(input, JsonLexer::TYPE_STRING, std::get<1>(test_case),
-                strlen(input));
+    std::unique_ptr<Token> token = lexer_.GetToken(input, 1, 1).value();
+    EXPECT_TOKEN(*token, JsonLexer::TYPE_STRING, std::get<1>(test_case), 1, 1);
+    EXPECT_EQ(strlen(input), token->length());
   }
 }
 

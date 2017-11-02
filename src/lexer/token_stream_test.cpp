@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "lexer/lexer.h"
+#include "lexer/token_test_macros.h"
 #include "util/status_test_macros.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 
@@ -22,44 +23,32 @@ class TestLexer : public Lexer {
   }
 };
 
-class TokenStreamTest : public testing::Test {
- protected:
-  void ExpectToken(TokenStream* token_stream, int type, const std::string& value,
-                   int line, int column) {
-    auto status_or = token_stream->GetNextToken();
-    EXPECT_OK(status_or);
-    auto token = status_or.value();
-    EXPECT_EQ(type, token->type());
-    EXPECT_EQ(value, token->value());
-    EXPECT_EQ(line, token->line());
-    EXPECT_EQ(column, token->column());
-  }
-};
-
-TEST_F(TokenStreamTest, GetNextToken) {
+TEST(TokenStreamTest, GetNextToken) {
   TestLexer lexer;
   TokenStream token_stream(&lexer, "a bc\nde  ");
   EXPECT_TRUE(token_stream.HasInput());
 
-  ExpectToken(&token_stream, TestLexer::TYPE_CHAR, "a", 1, 1);
-  ExpectToken(&token_stream, TestLexer::TYPE_CHAR, "b", 1, 3);
-  ExpectToken(&token_stream, TestLexer::TYPE_CHAR, "c", 1, 4);
-  ExpectToken(&token_stream, TestLexer::TYPE_CHAR, "d", 2, 1);
-  ExpectToken(&token_stream, TestLexer::TYPE_CHAR, "e", 2, 2);
-  ExpectToken(&token_stream, TestLexer::TYPE_END_OF_INPUT,
-              "(end of input)", 2, 5);
-  ExpectToken(&token_stream, TestLexer::TYPE_END_OF_INPUT,
-              "(end of input)", 2, 5);
+  EXPECT_TOKEN(*token_stream.GetNextToken().value(), TestLexer::TYPE_CHAR,
+               "a", 1, 1);
+  EXPECT_TOKEN(*token_stream.GetNextToken().value(), TestLexer::TYPE_CHAR,
+               "b", 1, 3);
+  EXPECT_TOKEN(*token_stream.GetNextToken().value(), TestLexer::TYPE_CHAR,
+               "c", 1, 4);
+  EXPECT_TOKEN(*token_stream.GetNextToken().value(), TestLexer::TYPE_CHAR,
+               "d", 2, 1);
+  EXPECT_TOKEN(*token_stream.GetNextToken().value(), TestLexer::TYPE_CHAR,
+               "e", 2, 2);
+  EXPECT_TOKEN(*token_stream.GetNextToken().value(),
+               TestLexer::TYPE_END_OF_INPUT, "(end of input)", 2, 5);
+  EXPECT_TOKEN(*token_stream.GetNextToken().value(),
+               TestLexer::TYPE_END_OF_INPUT, "(end of input)", 2, 5);
 
   EXPECT_FALSE(token_stream.HasInput());
 }
 
-TEST_F(TokenStreamTest, GetNextTokenError) {
+TEST(TokenStreamTest, GetNextTokenError) {
   TestLexer lexer;
   TokenStream token_stream(&lexer, "f");
   EXPECT_TRUE(token_stream.HasInput());
-
-  auto status_or = token_stream.GetNextToken();
-  EXPECT_FALSE(status_or.ok());
-  EXPECT_EQ("fail", status_or.status().message());
+  EXPECT_EQ("fail", token_stream.GetNextToken().status().message());
 }
