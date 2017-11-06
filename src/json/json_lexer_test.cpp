@@ -7,20 +7,16 @@
 
 class JsonLexerTest : public testing::Test {
  protected:
-  Token GetToken(const char* input) {
-    return *lexer_.GetToken(input, 1, 1).value();
-  }
-
-  Status GetStatus(const char* input) {
-    return lexer_.GetToken(input, 1, 1).status();
+  StatusOr<std::unique_ptr<Token>> GetToken(const char* input) {
+    return lexer_.GetToken(input, 1, 1);
   }
 
   JsonLexer lexer_;
 };
 
 TEST_F(JsonLexerTest, GetTokenUnexpected) {
-  EXPECT_STATUS(GetStatus("."), "Unexpected character: .", 1, 1);
-  EXPECT_STATUS(GetStatus("blah"), "Unexpected character: b", 1, 1);
+  EXPECT_STATUS(GetToken(".").status(), "Unexpected character: .", 1, 1);
+  EXPECT_STATUS(GetToken("blah").status(), "Unexpected character: b", 1, 1);
 }
 
 TEST_F(JsonLexerTest, GetTokenOperators) {
@@ -35,7 +31,7 @@ TEST_F(JsonLexerTest, GetTokenOperators) {
 
   for (const auto& test_case : test_cases) {
     const char* input = test_case.first;
-    EXPECT_TOKEN(GetToken(input), test_case.second, input, 1, 1);
+    EXPECT_TOKEN(*GetToken(input).value(), test_case.second, input, 1, 1);
   }
 }
 
@@ -43,7 +39,7 @@ TEST_F(JsonLexerTest, GetTokenKeyword) {
   const char* test_cases[] = {"false", "null", "true"};
 
   for (const char* test_case : test_cases) {
-    EXPECT_TOKEN(GetToken(test_case), JsonLexer::TYPE_KEYWORD, test_case, 1, 1);
+    EXPECT_TOKEN(*GetToken(test_case).value(), JsonLexer::TYPE_KEYWORD, test_case, 1, 1);
   }
 }
 
@@ -55,7 +51,7 @@ TEST_F(JsonLexerTest, GetTokenNumber) {
   };
 
   for (const char* test_case : test_cases) {
-    EXPECT_TOKEN(GetToken(test_case), JsonLexer::TYPE_NUMBER, test_case, 1, 1);
+    EXPECT_TOKEN(*GetToken(test_case).value(), JsonLexer::TYPE_NUMBER, test_case, 1, 1);
   }
 }
 
@@ -63,7 +59,7 @@ TEST_F(JsonLexerTest, GetTokenNumberError) {
   const char* test_cases[] = { "-", "1.", "23e", "35E+" };
 
   for (const char* test_case : test_cases) {
-    EXPECT_STATUS(GetStatus(test_case), "Unexpected end of input", 1, 1);
+    EXPECT_STATUS(GetToken(test_case).status(), "Unexpected end of input", 1, 1);
   }
 }
 
@@ -101,6 +97,6 @@ TEST_F(JsonLexerTest, GetTokenStringError) {
   };
 
   for (const auto& test_case : test_cases) {
-    EXPECT_STATUS(GetStatus(test_case.first), test_case.second, 1, 1);
+    EXPECT_STATUS(GetToken(test_case.first).status(), test_case.second, 1, 1);
   }
 }
