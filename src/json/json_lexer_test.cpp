@@ -8,7 +8,7 @@
 class JsonLexerTest : public testing::Test {
  protected:
   Token GetToken(const char* input) {
-    return *lexer_.GetToken(input, 1, 1).value().get();
+    return *lexer_.GetToken(input, 1, 1).value();
   }
 
   Status GetStatus(const char* input) {

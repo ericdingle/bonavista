@@ -23,7 +23,7 @@ StatusOr<std::unique_ptr<Node>> Parser::Parse() {
 }
 
 bool Parser::HasInput() const {
-  return look_ahead_token_.get() ?
+  return look_ahead_token_ ?
       !look_ahead_token_->IsType(Lexer::TYPE_END_OF_INPUT) :
       token_stream_->HasInput();
 }

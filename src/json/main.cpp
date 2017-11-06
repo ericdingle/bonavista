@@ -6,7 +6,7 @@
 #include "lexer/token_stream.h"
 #include "parser/node.h"
 
-void PrintJsonTree(const Node* node, int level);
+void PrintJsonTree(const Node& node, int level);
 
 int main(int argc, char* argv[]) {
   if (argc != 2) {
@@ -28,46 +28,46 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  PrintJsonTree(status_or.value().get(), 0);
+  PrintJsonTree(*status_or.value(), 0);
   printf("\n");
 
   return 0;
 }
 
-void PrintJsonTree(const Node* node, int level) {
+void PrintJsonTree(const Node& node, int level) {
   std::string indent(2 * level, ' ');
 
-  if (node->token().IsType(JsonLexer::TYPE_LEFT_BRACE)) {
+  if (node.token().IsType(JsonLexer::TYPE_LEFT_BRACE)) {
     printf("{");
-    const std::vector<std::unique_ptr<const Node> >& children = node->children();
+    const auto& children = node.children();
     const char* comma = "";
     for(uint i = 0; i < children.size(); i += 2) {
       printf("%s\n%s  %s: ", comma, indent.c_str(),
              children[i]->token().value().c_str());
       comma = ",";
-      PrintJsonTree(children[i + 1].get(), level + 1);
+      PrintJsonTree(*children[i + 1], level + 1);
     }
     printf("\n%s}", indent.c_str());
     return;
   }
 
-  if (node->token().IsType(JsonLexer::TYPE_LEFT_BRACKET)) {
+  if (node.token().IsType(JsonLexer::TYPE_LEFT_BRACKET)) {
     printf("[");
-    const std::vector<std::unique_ptr<const Node> >& children = node->children();
+    const auto& children = node.children();
     const char* comma = "";
     for(uint i = 0; i < children.size(); ++i) {
       printf("%s\n%s  ", comma, indent.c_str());
       comma = ",";
-      PrintJsonTree(children[i].get(), level + 1);
+      PrintJsonTree(*children[i], level + 1);
     }
     printf("\n%s]", indent.c_str());
     return;
   }
 
-  if (node->token().IsType(JsonLexer::TYPE_STRING)) {
-    printf("\"%s\"", node->token().value().c_str());
+  if (node.token().IsType(JsonLexer::TYPE_STRING)) {
+    printf("\"%s\"", node.token().value().c_str());
     return;
   }
 
-  printf("%s", node->token().value().c_str());
+  printf("%s", node.token().value().c_str());
 }
