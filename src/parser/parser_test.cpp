@@ -1,11 +1,10 @@
-#include "parser/parser.h"
-
 #include "lexer/lexer.h"
 #include "lexer/token_stream.h"
 #include "lexer/token_test_macros.h"
 #include "parser/node.h"
+#include "parser/parser.h"
+#include "parser/parser_test_fixture.h"
 #include "util/status_test_macros.h"
-#include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 class TestLexer : public Lexer {
  public:
@@ -66,14 +65,7 @@ class TestParser : public Parser {
   }
 };
 
-class ParserTest : public testing::Test {
- protected:
-  StatusOr<std::unique_ptr<Node>> Parse(const char* input) {
-    TestLexer lexer;
-    TokenStream stream(&lexer, input);
-    TestParser parser(&stream);
-    return parser.Parse();
-  }
+class ParserTest : public ParserTestFixture<TestLexer, TestParser> {
 };
 
 TEST_F(ParserTest, ExpectToken) {

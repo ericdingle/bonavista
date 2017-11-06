@@ -3,17 +3,10 @@
 #include "json/json_lexer.h"
 #include "json/json_parser.h"
 #include "parser/node.h"
+#include "parser/parser_test_fixture.h"
 #include "util/status_test_macros.h"
-#include "third_party/googletest/googletest/include/gtest/gtest.h"
 
-class JsonParserTest : public testing::Test {
- protected:
-  StatusOr<std::unique_ptr<Node>> Parse(const char* input) {
-    JsonLexer lexer;
-    TokenStream stream(&lexer, input);
-    JsonParser parser(&stream);
-    return parser.Parse();
-  }
+class JsonParserTest : public ParserTestFixture<JsonLexer, JsonParser> {
 };
 
 TEST_F(JsonParserTest, ParseEmpty) {
