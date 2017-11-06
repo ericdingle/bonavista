@@ -23,11 +23,9 @@ StatusOr<std::unique_ptr<Node>> JsonParser::ParsePrefixToken(
   else if (token->IsType(JsonLexer::TYPE_LEFT_BRACKET))
     return ParseArray(std::move(token));
 
-  if (token->IsType(JsonLexer::TYPE_FALSE) ||
-      token->IsType(JsonLexer::TYPE_NULL) ||
+  if (token->IsType(JsonLexer::TYPE_KEYWORD) ||
       token->IsType(JsonLexer::TYPE_NUMBER) ||
-      token->IsType(JsonLexer::TYPE_STRING) ||
-      token->IsType(JsonLexer::TYPE_TRUE))
+      token->IsType(JsonLexer::TYPE_STRING))
     return std::unique_ptr<Node>(new Node(std::move(token)));
 
   return UnexpectedToken(*token);

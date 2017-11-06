@@ -40,15 +40,10 @@ TEST_F(JsonLexerTest, GetTokenOperators) {
 }
 
 TEST_F(JsonLexerTest, GetTokenKeyword) {
-  std::pair<const char*, JsonLexer::Type> test_cases[] = {
-      {"false", JsonLexer::TYPE_FALSE},
-      {"null", JsonLexer::TYPE_NULL},
-      {"true", JsonLexer::TYPE_TRUE},
-      };
+  const char* test_cases[] = {"false", "null", "true"};
 
-  for (const auto& test_case : test_cases) {
-    const char* input = test_case.first;
-    EXPECT_TOKEN(GetToken(input), test_case.second, input, 1, 1);
+  for (const char* test_case : test_cases) {
+    EXPECT_TOKEN(GetToken(test_case), JsonLexer::TYPE_KEYWORD, test_case, 1, 1);
   }
 }
 

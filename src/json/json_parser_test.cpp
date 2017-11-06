@@ -25,11 +25,9 @@ TEST_F(JsonParserTest, ParseUnknown) {
 }
 
 TEST_F(JsonParserTest, ParsePrimitive) {
-  EXPECT_TOKEN(Parse("false").value()->token(), JsonLexer::TYPE_FALSE, "false", 1, 1);
-  EXPECT_TOKEN(Parse("null").value()->token(), JsonLexer::TYPE_NULL, "null", 1, 1);
+  EXPECT_TOKEN(Parse("false").value()->token(), JsonLexer::TYPE_KEYWORD, "false", 1, 1);
   EXPECT_TOKEN(Parse("1").value()->token(), JsonLexer::TYPE_NUMBER, "1", 1, 1);
   EXPECT_TOKEN(Parse("\"test\"").value()->token(), JsonLexer::TYPE_STRING, "test", 1, 1);
-  EXPECT_TOKEN(Parse("true").value()->token(), JsonLexer::TYPE_TRUE, "true", 1, 1);
 }
 
 TEST_F(JsonParserTest, ParseObject) {
@@ -43,7 +41,7 @@ TEST_F(JsonParserTest, ParseObject) {
   EXPECT_TOKEN(children[0]->token(), JsonLexer::TYPE_STRING, "a", 1, 2);
   EXPECT_TOKEN(children[1]->token(), JsonLexer::TYPE_NUMBER, "1", 1, 7);
   EXPECT_TOKEN(children[2]->token(), JsonLexer::TYPE_STRING, "b", 1, 10);
-  EXPECT_TOKEN(children[3]->token(), JsonLexer::TYPE_FALSE, "false", 1, 15);
+  EXPECT_TOKEN(children[3]->token(), JsonLexer::TYPE_KEYWORD, "false", 1, 15);
 }
 
 TEST_F(JsonParserTest, ParseObjectError) {
@@ -64,7 +62,7 @@ TEST_F(JsonParserTest, ParseArray) {
 
   const auto& children = node->children();
   EXPECT_TOKEN(children[0]->token(), JsonLexer::TYPE_NUMBER, "1", 1, 2);
-  EXPECT_TOKEN(children[1]->token(), JsonLexer::TYPE_FALSE, "false", 1, 5);
+  EXPECT_TOKEN(children[1]->token(), JsonLexer::TYPE_KEYWORD, "false", 1, 5);
   EXPECT_TOKEN(children[2]->token(), JsonLexer::TYPE_STRING, "test", 1, 12);
 }
 

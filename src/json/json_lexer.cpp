@@ -38,11 +38,11 @@ StatusOr<std::unique_ptr<Token>> JsonLexer::GetToken(
 StatusOr<std::unique_ptr<Token>> JsonLexer::GetKeywordToken(
     const char* input, int line, int column) const {
   if (strncmp(input, "false", 5) == 0) {
-    return std::unique_ptr<Token>(new Token(TYPE_FALSE, "false", line, column));
+    return std::unique_ptr<Token>(new Token(TYPE_KEYWORD, "false", line, column));
   } else if (strncmp(input, "null", 4) == 0) {
-    return std::unique_ptr<Token>(new Token(TYPE_NULL, "null", line, column));
+    return std::unique_ptr<Token>(new Token(TYPE_KEYWORD, "null", line, column));
   } else if (strncmp(input, "true", 4) == 0) {
-    return std::unique_ptr<Token>(new Token(TYPE_TRUE, "true", line, column));
+    return std::unique_ptr<Token>(new Token(TYPE_KEYWORD, "true", line, column));
   }
 
   return UnexpectedCharacter(*input, line, column);

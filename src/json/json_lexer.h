@@ -13,14 +13,12 @@ class JsonLexer : public Lexer {
   enum Type {
     TYPE_COLON,
     TYPE_COMMA,
-    TYPE_FALSE,
+    TYPE_KEYWORD,
     TYPE_LEFT_BRACE,
     TYPE_LEFT_BRACKET,
-    TYPE_NULL,
     TYPE_NUMBER,
     TYPE_RIGHT_BRACE,
     TYPE_RIGHT_BRACKET,
-    TYPE_TRUE,
     TYPE_STRING
   };
 
