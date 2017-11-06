@@ -1,22 +1,15 @@
-#include <cstring>
 #include <utility>
 #include "json/json_lexer.h"
+#include "lexer/lexer_test_fixture.h"
 #include "lexer/token_test_macros.h"
 #include "util/status_test_macros.h"
-#include "third_party/googletest/googletest/include/gtest/gtest.h"
 
-class JsonLexerTest : public testing::Test {
- protected:
-  StatusOr<std::unique_ptr<Token>> GetToken(const char* input) {
-    return lexer_.GetToken(input, 1, 1);
-  }
-
-  JsonLexer lexer_;
+class JsonLexerTest : public LexerTestFixture<JsonLexer> {
 };
 
 TEST_F(JsonLexerTest, GetTokenUnexpected) {
-  EXPECT_STATUS(GetToken(".").status(), "Unexpected character: .", 1, 1);
-  EXPECT_STATUS(GetToken("blah").status(), "Unexpected character: b", 1, 1);
+  EXPECT_STATUS(GetToken(".").status(), "Unexpected character: .", 1, 2);
+  EXPECT_STATUS(GetToken("blah").status(), "Unexpected character: b", 1, 2);
 }
 
 TEST_F(JsonLexerTest, GetTokenOperators) {
@@ -31,7 +24,7 @@ TEST_F(JsonLexerTest, GetTokenOperators) {
 
   for (const auto& test_case : test_cases) {
     const char* input = test_case.first;
-    EXPECT_TOKEN(*GetToken(input).value(), test_case.second, input, 1, 1);
+    EXPECT_TOKEN(*GetToken(input).value(), test_case.second, input, 1, 2);
   }
 }
 
@@ -39,7 +32,7 @@ TEST_F(JsonLexerTest, GetTokenKeyword) {
   const char* test_cases[] = {"false", "null", "true"};
 
   for (const char* test_case : test_cases) {
-    EXPECT_TOKEN(*GetToken(test_case).value(), JsonLexer::TYPE_KEYWORD, test_case, 1, 1);
+    EXPECT_TOKEN(*GetToken(test_case).value(), JsonLexer::TYPE_KEYWORD, test_case, 1, 2);
   }
 }
 
@@ -51,7 +44,7 @@ TEST_F(JsonLexerTest, GetTokenNumber) {
   };
 
   for (const char* test_case : test_cases) {
-    EXPECT_TOKEN(*GetToken(test_case).value(), JsonLexer::TYPE_NUMBER, test_case, 1, 1);
+    EXPECT_TOKEN(*GetToken(test_case).value(), JsonLexer::TYPE_NUMBER, test_case, 1, 2);
   }
 }
 
@@ -59,7 +52,7 @@ TEST_F(JsonLexerTest, GetTokenNumberError) {
   const char* test_cases[] = { "-", "1.", "23e", "35E+" };
 
   for (const char* test_case : test_cases) {
-    EXPECT_STATUS(GetToken(test_case).status(), "Unexpected end of input", 1, 1);
+    EXPECT_STATUS(GetToken(test_case).status(), "Unexpected end of input", 1, 2);
   }
 }
 
@@ -79,10 +72,9 @@ TEST_F(JsonLexerTest, GetTokenString) {
   };
 
   for (const auto& test_case : test_cases) {
-    const char* input = test_case.first;
-    std::unique_ptr<Token> token = lexer_.GetToken(input, 1, 1).value();
-    EXPECT_TOKEN(*token, JsonLexer::TYPE_STRING, test_case.second, 1, 1);
-    EXPECT_EQ(strlen(input), token->length());
+    std::unique_ptr<Token> token = GetToken(test_case.first).value();
+    EXPECT_TOKEN(*token, JsonLexer::TYPE_STRING, test_case.second, 1, 2);
+    EXPECT_EQ(strlen(test_case.first), token->length());
   }
 }
 
@@ -97,6 +89,6 @@ TEST_F(JsonLexerTest, GetTokenStringError) {
   };
 
   for (const auto& test_case : test_cases) {
-    EXPECT_STATUS(GetToken(test_case.first).status(), test_case.second, 1, 1);
+    EXPECT_STATUS(GetToken(test_case.first).status(), test_case.second, 1, 2);
   }
 }
