@@ -2,6 +2,7 @@
 
 #include "lexer/lexer.h"
 #include "lexer/token_stream.h"
+#include "lexer/token_test_macros.h"
 #include "parser/node.h"
 #include "util/status_test_macros.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
@@ -73,20 +74,6 @@ class ParserTest : public testing::Test {
     TestParser parser(&stream);
     return parser.Parse();
   }
-
-  void ExpectNode(const StatusOr<std::unique_ptr<Node>>& status_or,
-                  int type, int num_children) {
-    EXPECT_TRUE(status_or.ok());
-    const auto& node = status_or.value();
-    EXPECT_EQ(type, node->token().type());
-    EXPECT_EQ(num_children, node->children().size());
-  }
-
-  void ExpectNode(const StatusOr<std::unique_ptr<Node>>& status_or,
-                  int type, const std::string& value, int num_children) {
-    ExpectNode(status_or, type, num_children);
-    EXPECT_EQ(value, status_or.value()->token().value());
-  }
 };
 
 TEST_F(ParserTest, ExpectToken) {
@@ -109,7 +96,7 @@ TEST_F(ParserTest, UnexpectedCharacter) {
 }
 
 TEST_F(ParserTest, Prefix) {
-  ExpectNode(Parse("1"), TestLexer::TYPE_DIGIT, 0);
+  EXPECT_TOKEN(Parse("1").value()->token(), TestLexer::TYPE_DIGIT, "1", 1, 1);
 }
 
 TEST_F(ParserTest, PrefixError) {
@@ -117,7 +104,11 @@ TEST_F(ParserTest, PrefixError) {
 }
 
 TEST_F(ParserTest, Infix) {
-  ExpectNode(Parse("1+2"), TestLexer::TYPE_PLUS, 2);
+  std::unique_ptr<Node> node = Parse("1+2").value();
+  EXPECT_TOKEN(node->token(), TestLexer::TYPE_PLUS, "+", 1, 2);
+  EXPECT_EQ(2, node->children().size());
+  EXPECT_TOKEN(node->children()[0]->token(), TestLexer::TYPE_DIGIT, "1", 1, 1);
+  EXPECT_TOKEN(node->children()[1]->token(), TestLexer::TYPE_DIGIT, "2", 1, 3);
 }
 
 TEST_F(ParserTest, InfixError) {
@@ -125,7 +116,9 @@ TEST_F(ParserTest, InfixError) {
 }
 
 TEST_F(ParserTest, ConsumeToken) {
-  ExpectNode(Parse("01"), TestLexer::TYPE_DIGIT, "0", 0);
+  std::unique_ptr<Node> node = Parse("01").value();
+  EXPECT_TOKEN(node->token(), TestLexer::TYPE_DIGIT, "0", 1, 1);
+  EXPECT_TRUE(node->children().empty());
 }
 
 TEST_F(ParserTest, ConsumeTokenError) {
@@ -138,7 +131,9 @@ TEST_F(ParserTest, ParseMultiple) {
   TestParser parser(&stream);
 
   for (int i = 0; i < 3; ++i) {
-    ExpectNode(parser.Parse(), TestLexer::TYPE_DIGIT, "1", 0);
+    std::unique_ptr<Node> node = parser.Parse().value();
+    EXPECT_TOKEN(node->token(), TestLexer::TYPE_DIGIT, "1", 1, 2 * i + 1);
+    EXPECT_TRUE(node->children().empty());
   }
 
   EXPECT_STATUS(parser.Parse().status(), "Unexpected token: (end of input)", 1, 6);

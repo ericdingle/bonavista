@@ -1,4 +1,5 @@
 #include "lexer/token_stream.h"
+#include "lexer/token_test_macros.h"
 #include "json/json_lexer.h"
 #include "json/json_parser.h"
 #include "parser/node.h"
@@ -13,12 +14,6 @@ class JsonParserTest : public testing::Test {
     JsonParser parser(&stream);
     return parser.Parse();
   }
-
-  void ExpectToken(const char* input, int type) {
-    auto status_or = Parse(input);
-    ASSERT_TRUE(status_or.ok()) << status_or.status().ToString();
-    EXPECT_EQ(type, status_or.value()->token().type());
-  }
 };
 
 TEST_F(JsonParserTest, ParseEmpty) {
@@ -30,27 +25,25 @@ TEST_F(JsonParserTest, ParseUnknown) {
 }
 
 TEST_F(JsonParserTest, ParsePrimitive) {
-  ExpectToken("false", JsonLexer::TYPE_FALSE);
-  ExpectToken("null", JsonLexer::TYPE_NULL);
-  ExpectToken("1", JsonLexer::TYPE_NUMBER);
-  ExpectToken("\"test\"", JsonLexer::TYPE_STRING);
-  ExpectToken("true", JsonLexer::TYPE_TRUE);
+  EXPECT_TOKEN(Parse("false").value()->token(), JsonLexer::TYPE_FALSE, "false", 1, 1);
+  EXPECT_TOKEN(Parse("null").value()->token(), JsonLexer::TYPE_NULL, "null", 1, 1);
+  EXPECT_TOKEN(Parse("1").value()->token(), JsonLexer::TYPE_NUMBER, "1", 1, 1);
+  EXPECT_TOKEN(Parse("\"test\"").value()->token(), JsonLexer::TYPE_STRING, "test", 1, 1);
+  EXPECT_TOKEN(Parse("true").value()->token(), JsonLexer::TYPE_TRUE, "true", 1, 1);
 }
 
 TEST_F(JsonParserTest, ParseObject) {
-  ExpectToken("{}", JsonLexer::TYPE_LEFT_BRACE);
+  EXPECT_TOKEN(Parse("{}").value()->token(), JsonLexer::TYPE_LEFT_BRACE, "{", 1, 1);
 
-  auto status_or = Parse("{\"a\": 1, \"b\": false}");
-  EXPECT_TRUE(status_or.ok());
-  const auto& root = status_or.value();
-  EXPECT_EQ(JsonLexer::TYPE_LEFT_BRACE, root->token().type());
-  EXPECT_EQ(4, root->children().size());
+  std::unique_ptr<Node> node = Parse("{\"a\": 1, \"b\": false}").value();
+  EXPECT_TOKEN(node->token(), JsonLexer::TYPE_LEFT_BRACE, "{", 1, 1);
+  EXPECT_EQ(4, node->children().size());
 
-  const auto& children = root->children();
-  EXPECT_EQ(JsonLexer::TYPE_STRING, children[0]->token().type());
-  EXPECT_EQ(JsonLexer::TYPE_NUMBER, children[1]->token().type());
-  EXPECT_EQ(JsonLexer::TYPE_STRING, children[2]->token().type());
-  EXPECT_EQ(JsonLexer::TYPE_FALSE, children[3]->token().type());
+  const auto& children = node->children();
+  EXPECT_TOKEN(children[0]->token(), JsonLexer::TYPE_STRING, "a", 1, 2);
+  EXPECT_TOKEN(children[1]->token(), JsonLexer::TYPE_NUMBER, "1", 1, 7);
+  EXPECT_TOKEN(children[2]->token(), JsonLexer::TYPE_STRING, "b", 1, 10);
+  EXPECT_TOKEN(children[3]->token(), JsonLexer::TYPE_FALSE, "false", 1, 15);
 }
 
 TEST_F(JsonParserTest, ParseObjectError) {
@@ -63,18 +56,16 @@ TEST_F(JsonParserTest, ParseObjectError) {
 }
 
 TEST_F(JsonParserTest, ParseArray) {
-  ExpectToken("[]", JsonLexer::TYPE_LEFT_BRACKET);
+  EXPECT_TOKEN(Parse("[]").value()->token(), JsonLexer::TYPE_LEFT_BRACKET, "[", 1, 1);
 
-  auto status_or = Parse("[1, false, \"test\"]");
-  EXPECT_TRUE(status_or.ok());
-  const auto& root = status_or.value();
-  EXPECT_EQ(JsonLexer::TYPE_LEFT_BRACKET, root->token().type());
-  EXPECT_EQ(3, root->children().size());
+  std::unique_ptr<Node> node = Parse("[1, false, \"test\"]").value();
+  EXPECT_TOKEN(node->token(), JsonLexer::TYPE_LEFT_BRACKET, "[", 1, 1);
+  EXPECT_EQ(3, node->children().size());
 
-  const auto& children = root->children();
-  EXPECT_EQ(JsonLexer::TYPE_NUMBER, children[0]->token().type());
-  EXPECT_EQ(JsonLexer::TYPE_FALSE, children[1]->token().type());
-  EXPECT_EQ(JsonLexer::TYPE_STRING, children[2]->token().type());
+  const auto& children = node->children();
+  EXPECT_TOKEN(children[0]->token(), JsonLexer::TYPE_NUMBER, "1", 1, 2);
+  EXPECT_TOKEN(children[1]->token(), JsonLexer::TYPE_FALSE, "false", 1, 5);
+  EXPECT_TOKEN(children[2]->token(), JsonLexer::TYPE_STRING, "test", 1, 12);
 }
 
 TEST_F(JsonParserTest, ParseArrayError) {
