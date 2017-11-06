@@ -42,7 +42,7 @@ void PrintJsonTree(const Node& node, int level) {
     const auto& children = node.children();
     const char* comma = "";
     for(uint i = 0; i < children.size(); i += 2) {
-      printf("%s\n%s  %s: ", comma, indent.c_str(),
+      printf("%s\n%s  \"%s\": ", comma, indent.c_str(),
              children[i]->token().value().c_str());
       comma = ",";
       PrintJsonTree(*children[i + 1], level + 1);
