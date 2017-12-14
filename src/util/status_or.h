@@ -10,10 +10,9 @@ class StatusOr {
   StatusOr(const Value& value);
   StatusOr(Value&& value);
 
-  StatusOr(const StatusOr& s);
-  StatusOr(StatusOr&& s);
+  StatusOr(const StatusOr& s) = default;
+  StatusOr(StatusOr&& s) = default;
   StatusOr operator=(const StatusOr&) = delete;
-  StatusOr operator=(StatusOr&&) = delete;
 
   ~StatusOr() = default;
 
@@ -37,16 +36,6 @@ inline StatusOr<Value>::StatusOr(const Value& value) : value_(value) {
 
 template <typename Value>
 inline StatusOr<Value>::StatusOr(Value&& value) : value_(std::move(value)) {
-}
-
-template <typename Value>
-inline StatusOr<Value>::StatusOr(const StatusOr& s)
-    : status_(s.status_), value_(s.value_) {
-}
-
-template <typename Value>
-inline StatusOr<Value>::StatusOr(StatusOr&& s)
-    : status_(s.status_), value_(std::move(s.value_)) {
 }
 
 template <typename Value>
