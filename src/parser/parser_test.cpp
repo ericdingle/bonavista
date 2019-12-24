@@ -98,7 +98,7 @@ TEST_F(ParserTest, PrefixError) {
 TEST_F(ParserTest, Infix) {
   std::unique_ptr<Node> node = Parse("1+2").value();
   EXPECT_TOKEN(node->token(), TestLexer::TYPE_PLUS, "+", 1, 2);
-  EXPECT_EQ(2, node->children().size());
+  EXPECT_EQ(2U, node->children().size());
   EXPECT_TOKEN(node->children()[0]->token(), TestLexer::TYPE_DIGIT, "1", 1, 1);
   EXPECT_TOKEN(node->children()[1]->token(), TestLexer::TYPE_DIGIT, "2", 1, 3);
 }

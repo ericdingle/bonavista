@@ -74,7 +74,7 @@ TEST_F(JsonLexerTest, GetTokenString) {
   for (const auto& test_case : test_cases) {
     std::unique_ptr<Token> token = GetToken(test_case.first).value();
     EXPECT_TOKEN(*token, JsonLexer::TYPE_STRING, test_case.second, 1, 2);
-    EXPECT_EQ(strlen(test_case.first), token->length());
+    EXPECT_EQ(static_cast<int>(strlen(test_case.first)), token->length());
   }
 }
 

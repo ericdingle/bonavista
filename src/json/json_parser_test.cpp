@@ -28,7 +28,7 @@ TEST_F(JsonParserTest, ParseObject) {
 
   std::unique_ptr<Node> node = Parse("{\"a\": 1, \"b\": false}").value();
   EXPECT_TOKEN(node->token(), JsonLexer::TYPE_LEFT_BRACE, "{", 1, 1);
-  EXPECT_EQ(4, node->children().size());
+  EXPECT_EQ(4U, node->children().size());
 
   const auto& children = node->children();
   EXPECT_TOKEN(children[0]->token(), JsonLexer::TYPE_STRING, "a", 1, 2);
@@ -51,7 +51,7 @@ TEST_F(JsonParserTest, ParseArray) {
 
   std::unique_ptr<Node> node = Parse("[1, false, \"test\"]").value();
   EXPECT_TOKEN(node->token(), JsonLexer::TYPE_LEFT_BRACKET, "[", 1, 1);
-  EXPECT_EQ(3, node->children().size());
+  EXPECT_EQ(3U, node->children().size());
 
   const auto& children = node->children();
   EXPECT_TOKEN(children[0]->token(), JsonLexer::TYPE_NUMBER, "1", 1, 2);
