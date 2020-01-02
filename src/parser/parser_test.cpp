@@ -14,14 +14,13 @@ class TestLexer : public Lexer {
   };
 
   StatusOr<std::unique_ptr<Token>> GetToken(
-      const char* input, int line, int column) const override {
-    if (*input == '+') {
-      return std::unique_ptr<Token>(new Token(TYPE_PLUS, "+", line, column));
-    } else if (IsDigit(*input)) {
-      return std::unique_ptr<Token>(new Token(TYPE_DIGIT, std::string(1, *input),
-                                              line, column));
+      std::string_view input, int line, int column) const override {
+    if (input[0] == '+') {
+      return std::make_unique<Token>(TYPE_PLUS, "+", line, column);
+    } else if (IsDigit(input[0])) {
+      return std::make_unique<Token>(TYPE_DIGIT, input.substr(0, 1), line, column);
     }
-    return UnexpectedCharacter(*input, line, column);
+    return UnexpectedCharacter(input[0], line, column);
   }
 };
 
@@ -119,7 +118,7 @@ TEST_F(ParserTest, ConsumeTokenError) {
 
 TEST_F(ParserTest, ParseMultiple) {
   TestLexer lexer;
-  TokenStream stream(&lexer, "1 1 1");
+  TokenStream stream(lexer, "1 1 1");
   TestParser parser(&stream);
 
   for (int i = 0; i < 3; ++i) {

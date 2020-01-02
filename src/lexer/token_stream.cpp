@@ -1,13 +1,9 @@
 #include "lexer/token_stream.h"
 
-#include <assert.h>
 #include "lexer/lexer.h"
 
-TokenStream::TokenStream(const Lexer* lexer, const std::string& input)
+TokenStream::TokenStream(const Lexer& lexer, std::string_view input)
     : lexer_(lexer), input_(input), index_(0), line_(1), column_(1) {
-}
-
-TokenStream::~TokenStream() {
 }
 
 StatusOr<std::unique_ptr<Token>> TokenStream::GetNextToken() {
@@ -29,13 +25,13 @@ StatusOr<std::unique_ptr<Token>> TokenStream::GetNextToken() {
 
   // If we've reached the end, we return an end of input token.
   if (!HasInput()) {
-    return std::unique_ptr<Token>(
-        new Token(Lexer::TYPE_END_OF_INPUT, "(end of input)", line_, column_));
+    return std::make_unique<Token>(Lexer::TYPE_END_OF_INPUT, "(end of input)",
+                                   line_, column_);
   }
 
   // Call into the lexer to get the token.
   ASSIGN_OR_RETURN(
-      auto token, lexer_->GetToken(input_.c_str() + index_, line_, column_));
+      auto token, lexer_.GetToken(input_.substr(index_), line_, column_));
 
   // Increment the index and position.
   index_ += token->length();
@@ -45,6 +41,5 @@ StatusOr<std::unique_ptr<Token>> TokenStream::GetNextToken() {
 }
 
 bool TokenStream::HasInput() const {
-  assert(index_ >= 0);
-  return static_cast<unsigned int>(index_) < input_.length();
+  return index_ < static_cast<int>(input_.length());
 }

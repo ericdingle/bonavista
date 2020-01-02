@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
                      (std::istreambuf_iterator<char>()));
 
   JsonLexer lexer;
-  TokenStream stream(&lexer, buffer.c_str());
+  TokenStream stream(lexer, buffer);
 
   JsonParser parser(&stream);
   StatusOr<std::unique_ptr<Node>> status_or = parser.Parse();
@@ -42,8 +42,9 @@ void PrintJsonTree(const Node& node, int level) {
     const auto& children = node.children();
     const char* comma = "";
     for(uint i = 0; i < children.size(); i += 2) {
-      printf("%s\n%s  \"%s\": ", comma, indent.c_str(),
-             children[i]->token().value().c_str());
+      std::string_view value = children[i]->token().value();
+      printf("%s\n%s  \"%.*s\": ", comma, indent.c_str(),
+             static_cast<int>(value.size()), value.data());
       comma = ",";
       PrintJsonTree(*children[i + 1], level + 1);
     }
@@ -64,10 +65,11 @@ void PrintJsonTree(const Node& node, int level) {
     return;
   }
 
+  std::string_view value = node.token().value();
   if (node.token().IsType(JsonLexer::TYPE_STRING)) {
-    printf("\"%s\"", node.token().value().c_str());
+    printf("\"%.*s\"", static_cast<int>(value.size()), value.data());
     return;
   }
 
-  printf("%s", node.token().value().c_str());
+  printf("%.*s", static_cast<int>(value.size()), value.data());
 }

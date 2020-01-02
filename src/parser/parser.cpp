@@ -33,7 +33,8 @@ Status Parser::ExpectToken(const Token& token, int type) {
 }
 
 Status Parser::UnexpectedToken(const Token& token) {
-  return Status("Unexpected token: " + token.value(), token.line(), token.column());
+  return Status(std::string("Unexpected token: ") + std::string(token.value()),
+                token.line(), token.column());
 }
 
 StatusOr<std::unique_ptr<Token>> Parser::GetNextToken() {

@@ -12,7 +12,7 @@ class ParserTestFixture : public testing::Test {
  protected:
   StatusOr<std::unique_ptr<Node>> Parse(const char* input) {
     LexerT lexer;
-    TokenStream stream(&lexer, input);
+    TokenStream stream(lexer, input);
     ParserT parser(&stream);
     return parser.Parse();
   }

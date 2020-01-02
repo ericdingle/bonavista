@@ -60,15 +60,15 @@ TEST_F(JsonLexerTest, GetTokenString) {
   std::pair<const char*, const char*> test_cases[] = {
       {"\"test\"", "test"},
       {"\"asdf jkl;\"", "asdf jkl;"},
-      {"\"test\\b\"", "test\b"},
-      {"\"test\\f\"", "test\f"},
-      {"\"test\\n\"", "test\n"},
-      {"\"test\\r\"", "test\r"},
-      {"\"test\\t\"", "test\t"},
-      {"\"test\\u1234\"", "test?"},
-      {"\"test\\\\\"", "test\\"},
-      {"\"test\\/\"", "test/"},
-      {"\"test\\\"\"", "test\""},
+      {"\"test\\b\"", "test\\b"},
+      {"\"test\\f\"", "test\\f"},
+      {"\"test\\n\"", "test\\n"},
+      {"\"test\\r\"", "test\\r"},
+      {"\"test\\t\"", "test\\t"},
+      {"\"test\\u1234\"", "test\\u1234"},
+      {"\"test\\\\\"", "test\\\\"},
+      {"\"test\\/\"", "test\\/"},
+      {"\"test\\\"\"", "test\\\""},
   };
 
   for (const auto& test_case : test_cases) {

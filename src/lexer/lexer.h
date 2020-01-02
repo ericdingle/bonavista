@@ -2,7 +2,7 @@
 #define LEXER_LEXER_H_
 
 #include <memory>
-#include <string>
+#include <string_view>
 #include "lexer/token.h"
 #include "util/status_or.h"
 #include "third_party/googletest/googletest/include/gtest/gtest_prod.h"
@@ -17,7 +17,7 @@ class Lexer {
   virtual ~Lexer() = default;
 
   virtual StatusOr<std::unique_ptr<Token>> GetToken(
-      const char* input, int line, int column) const = 0;
+      std::string_view input, int line, int column) const = 0;
 
  protected:
   static bool IsAlpha(char c);

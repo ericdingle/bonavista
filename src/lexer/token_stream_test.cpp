@@ -17,8 +17,8 @@ class TestLexer : public Lexer {
     if (input[0] == 'f') {
       return Status("fail", line, column);
     } else {
-      return std::unique_ptr<Token>(
-          new Token(TYPE_CHAR, std::string(1, input[0]), line, column));
+      return std::make_unique<Token>(TYPE_CHAR, std::string(1, input[0]), line,
+                                     column);
     }
   }
 };

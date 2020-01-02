@@ -5,7 +5,7 @@
   do {                                               \
     const Token _token = (expr);                     \
     EXPECT_EQ(t, _token.type());                     \
-    EXPECT_EQ(v, _token.value());                    \
+    EXPECT_EQ(std::string_view(v), _token.value());                    \
     EXPECT_EQ(l, _token.line());                     \
     EXPECT_EQ(c, _token.column());                   \
   } while(false)
