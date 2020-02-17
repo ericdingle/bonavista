@@ -13,11 +13,11 @@ class TestLexer : public Lexer {
   };
 
   StatusOr<std::unique_ptr<Token>> GetToken(
-      const char* input, int line, int column) const override {
+      std::string_view input, int line, int column) const override {
     if (input[0] == 'f') {
       return Status("fail", line, column);
     } else {
-      return std::make_unique<Token>(TYPE_CHAR, std::string(1, input[0]), line,
+      return std::make_unique<Token>(TYPE_CHAR, input.substr(0, 1), line,
                                      column);
     }
   }
@@ -32,7 +32,7 @@ class TokenStreamTest : public testing::Test {
 
 TEST_F(TokenStreamTest, GetNextToken) {
   TestLexer lexer;
-  TokenStream token_stream(&lexer, "a bc\nde  ");
+  TokenStream token_stream(lexer, "a bc\nde  ");
   EXPECT_TRUE(token_stream.HasInput());
 
   EXPECT_TOKEN(GetNextToken(&token_stream), TestLexer::TYPE_CHAR, "a", 1, 1);
@@ -50,7 +50,7 @@ TEST_F(TokenStreamTest, GetNextToken) {
 
 TEST_F(TokenStreamTest, GetNextTokenError) {
   TestLexer lexer;
-  TokenStream token_stream(&lexer, "f");
+  TokenStream token_stream(lexer, "f");
   EXPECT_TRUE(token_stream.HasInput());
   EXPECT_STATUS(token_stream.GetNextToken().status(), "fail", 1, 1);
 }
