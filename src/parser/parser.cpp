@@ -5,20 +5,15 @@
 Parser::Parser(TokenStream* token_stream) : token_stream_(token_stream) {
 }
 
-Parser::~Parser() {
-}
-
 StatusOr<std::unique_ptr<Node>> Parser::Parse() {
   if (!look_ahead_token_) {
     ASSIGN_OR_RETURN(auto token, GetNextToken());
   }
 
-  // Check for end of input.
   if (look_ahead_token_->IsType(Lexer::TYPE_END_OF_INPUT)) {
     return UnexpectedToken(*look_ahead_token_);
   }
 
-  // Parse expression.
   return ParseExpression(0);
 }
 

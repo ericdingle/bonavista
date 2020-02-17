@@ -14,7 +14,7 @@ class Parser {
   Parser(TokenStream* token_stream);
   Parser(const Parser&) = delete;
   Parser& operator=(const Parser&) = delete;
-  virtual ~Parser();
+  virtual ~Parser() = default;
 
   virtual StatusOr<std::unique_ptr<Node>> Parse();
 
