@@ -36,7 +36,7 @@ class TestParser : public Parser {
   StatusOr<std::unique_ptr<Node>> ParsePrefixToken(
       std::unique_ptr<const Token> token) override {
     if (token->IsType(TestLexer::TYPE_DIGIT)) {
-      auto node = std::unique_ptr<Node>(new Node(std::move(token)));
+      auto node = std::make_unique<Node>(std::move(token));
 
       // Weird behavior only for the test.
       if (node->token().value() == "0") {
@@ -52,7 +52,7 @@ class TestParser : public Parser {
       std::unique_ptr<const Token> token, std::unique_ptr<const Node> left)
       override {
     if (token->IsType(TestLexer::TYPE_PLUS)) {
-      auto node = std::unique_ptr<Node>(new Node(std::move(token)));
+      auto node = std::make_unique<Node>(std::move(token));
       node->AddChild(std::move(left));
 
       ASSIGN_OR_RETURN(auto right, ParseExpression(10));

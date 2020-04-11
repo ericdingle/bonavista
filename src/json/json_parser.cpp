@@ -26,7 +26,7 @@ StatusOr<std::unique_ptr<Node>> JsonParser::ParsePrefixToken(
   if (token->IsType(JsonLexer::TYPE_KEYWORD) ||
       token->IsType(JsonLexer::TYPE_NUMBER) ||
       token->IsType(JsonLexer::TYPE_STRING))
-    return std::unique_ptr<Node>(new Node(std::move(token)));
+    return std::make_unique<Node>(std::move(token));
 
   return UnexpectedToken(*token);
 }
@@ -38,7 +38,7 @@ StatusOr<std::unique_ptr<Node>> JsonParser::ParseObject(
   //  pair -> string ':' value
   //  pairs -> pair more_pairs | E
   //  more_pairs -> ',' pair more_pairs | E
-  std::unique_ptr<Node> node(new Node(std::move(token)));
+  auto node = std::make_unique_ptr<Node>(std::move(token));
 
   if (!look_ahead_token_->IsType(JsonLexer::TYPE_RIGHT_BRACE)) {
     while (true) {
@@ -68,7 +68,7 @@ StatusOr<std::unique_ptr<Node>> JsonParser::ParseArray(
   //   array -> '[' values ']'
   //   values -> value more_values | E
   //   more_values -> ',' value more_values | E
-  std::unique_ptr<Node> node(new Node(std::move(token)));
+  auto node = std::make_unique<Node>(std::move(token));
 
   if (!look_ahead_token_->IsType(JsonLexer::TYPE_RIGHT_BRACKET)) {
     while (true) {

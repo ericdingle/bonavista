@@ -16,7 +16,7 @@ TEST(StatusOrTest, ValuePOD) {
 }
 
 TEST(StatusOrTest, ValueUniquePtr) {
-  StatusOr<std::unique_ptr<int>> status_or(std::unique_ptr<int>(new int(1)));
+  StatusOr<std::unique_ptr<int>> status_or(std::make_unique<int>(1));
   EXPECT_OK(status_or);
   EXPECT_EQ(1, *status_or.value());
 }
@@ -25,7 +25,7 @@ TEST(StatusOrTest, AssignOrReturnStatus) {
   auto func = []() -> Status {
     ASSIGN_OR_RETURN(
         std::unique_ptr<int> i,
-        StatusOr<std::unique_ptr<int>>(std::unique_ptr<int>(new int(1))));
+        StatusOr<std::unique_ptr<int>>(std::make_unique<int>(1)));
     EXPECT_EQ(1, *i);
     ASSIGN_OR_RETURN(int j, StatusOr<int>(Status("yes", 1, 1)));
     (void)j;  // Fix unused warning.
