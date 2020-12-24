@@ -1,4 +1,5 @@
 #include "lexer/lexer.h"
+
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 #include "util/status_macros.h"
 

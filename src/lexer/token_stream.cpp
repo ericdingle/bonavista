@@ -4,8 +4,7 @@
 #include "util/status_macros.h"
 
 TokenStream::TokenStream(const Lexer& lexer, std::string_view input)
-    : lexer_(lexer), input_(input), index_(0), line_(1), column_(1) {
-}
+    : lexer_(lexer), input_(input), index_(0), line_(1), column_(1) {}
 
 absl::StatusOr<std::unique_ptr<Token>> TokenStream::GetNextToken() {
   // Consume the white space.
@@ -31,8 +30,8 @@ absl::StatusOr<std::unique_ptr<Token>> TokenStream::GetNextToken() {
   }
 
   // Call into the lexer to get the token.
-  ASSIGN_OR_RETURN(
-      auto token, lexer_.GetToken(input_.substr(index_), line_, column_));
+  ASSIGN_OR_RETURN(auto token,
+                   lexer_.GetToken(input_.substr(index_), line_, column_));
 
   // Increment the index and position.
   index_ += token->length();

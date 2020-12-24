@@ -1,4 +1,5 @@
 #include "lexer/token.h"
+
 #include "lexer/token_test_macros.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 

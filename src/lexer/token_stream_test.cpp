@@ -1,6 +1,7 @@
 #include "lexer/token_stream.h"
 
 #include <memory>
+
 #include "lexer/lexer.h"
 #include "lexer/token_test_macros.h"
 #include "third_party/absl/absl/strings/str_cat.h"
@@ -8,14 +9,14 @@
 
 class TestLexer : public Lexer {
  public:
-  enum Type {
-    TYPE_CHAR
-  };
+  enum Type { TYPE_CHAR };
 
-  absl::StatusOr<std::unique_ptr<Token>> GetToken(
-      std::string_view input, int line, int column) const override {
+  absl::StatusOr<std::unique_ptr<Token>> GetToken(std::string_view input,
+                                                  int line,
+                                                  int column) const override {
     if (input[0] == 'f') {
-      return absl::InvalidArgumentError(absl::StrCat("fail at ", line, ":", column, "."));
+      return absl::InvalidArgumentError(
+          absl::StrCat("fail at ", line, ":", column, "."));
     } else {
       return std::make_unique<Token>(TYPE_CHAR, input.substr(0, 1), line,
                                      column);

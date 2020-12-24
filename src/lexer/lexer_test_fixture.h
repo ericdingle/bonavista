@@ -2,9 +2,10 @@
 #define LEXER_LEXER_TEST_FIXTURE_H_
 
 #include <memory>
+
 #include "lexer/token.h"
-#include "third_party/googletest/googletest/include/gtest/gtest.h"
 #include "third_party/absl/absl/status/statusor.h"
+#include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 template <typename LexerT>
 class LexerTestFixture : public testing::Test {

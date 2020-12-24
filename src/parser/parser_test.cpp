@@ -1,24 +1,24 @@
+#include "parser/parser.h"
+
 #include "lexer/lexer.h"
 #include "lexer/token_stream.h"
 #include "lexer/token_test_macros.h"
 #include "parser/node.h"
-#include "parser/parser.h"
 #include "parser/parser_test_fixture.h"
 #include "util/status_macros.h"
 
 class TestLexer : public Lexer {
  public:
-  enum Type {
-    TYPE_DIGIT,
-    TYPE_PLUS
-  };
+  enum Type { TYPE_DIGIT, TYPE_PLUS };
 
-  absl::StatusOr<std::unique_ptr<Token>> GetToken(
-      std::string_view input, int line, int column) const override {
+  absl::StatusOr<std::unique_ptr<Token>> GetToken(std::string_view input,
+                                                  int line,
+                                                  int column) const override {
     if (input[0] == '+') {
       return std::make_unique<Token>(TYPE_PLUS, "+", line, column);
     } else if (IsDigit(input[0])) {
-      return std::make_unique<Token>(TYPE_DIGIT, input.substr(0, 1), line, column);
+      return std::make_unique<Token>(TYPE_DIGIT, input.substr(0, 1), line,
+                                     column);
     }
     return InvalidArgumentError(input[0], line, column);
   }
@@ -49,8 +49,8 @@ class TestParser : public Parser {
   }
 
   absl::StatusOr<std::unique_ptr<Node>> ParseInfixToken(
-      std::unique_ptr<const Token> token, std::unique_ptr<const Node> left)
-      override {
+      std::unique_ptr<const Token> token,
+      std::unique_ptr<const Node> left) override {
     if (token->IsType(TestLexer::TYPE_PLUS)) {
       auto node = std::make_unique<Node>(std::move(token));
       node->AddChild(std::move(left));
@@ -64,22 +64,24 @@ class TestParser : public Parser {
   }
 };
 
-class ParserTest : public ParserTestFixture<TestLexer, TestParser> {
-};
+class ParserTest : public ParserTestFixture<TestLexer, TestParser> {};
 
 TEST_F(ParserTest, ExpectToken) {
   Token token(1, "a", 2, 3);
   EXPECT_OK(Parser::ExpectToken(token, 1));
-  EXPECT_EQ(Parser::ExpectToken(token, 2).message(), "Unexpected token 'a' at 2:3.");
+  EXPECT_EQ(Parser::ExpectToken(token, 2).message(),
+            "Unexpected token 'a' at 2:3.");
 }
 
 TEST_F(ParserTest, UnexpectedToken) {
   Token token(1, "a", 2, 3);
-  EXPECT_EQ(Parser::UnexpectedToken(token).message(), "Unexpected token 'a' at 2:3.");
+  EXPECT_EQ(Parser::UnexpectedToken(token).message(),
+            "Unexpected token 'a' at 2:3.");
 }
 
 TEST_F(ParserTest, Empty) {
-  EXPECT_EQ(Parse("").status().message(), "Unexpected token '(end of input)' at 1:1.");
+  EXPECT_EQ(Parse("").status().message(),
+            "Unexpected token '(end of input)' at 1:1.");
 }
 
 TEST_F(ParserTest, UnexpectedCharacter) {
@@ -103,7 +105,8 @@ TEST_F(ParserTest, Infix) {
 }
 
 TEST_F(ParserTest, InfixError) {
-  EXPECT_EQ(Parse("1+").status().message(), "Unexpected token '(end of input)' at 1:3.");
+  EXPECT_EQ(Parse("1+").status().message(),
+            "Unexpected token '(end of input)' at 1:3.");
 }
 
 TEST_F(ParserTest, ConsumeToken) {
@@ -113,7 +116,8 @@ TEST_F(ParserTest, ConsumeToken) {
 }
 
 TEST_F(ParserTest, ConsumeTokenError) {
-  EXPECT_EQ(Parse("0").status().message(), "Unexpected token '(end of input)' at 1:2.");
+  EXPECT_EQ(Parse("0").status().message(),
+            "Unexpected token '(end of input)' at 1:2.");
 }
 
 TEST_F(ParserTest, ParseMultiple) {
@@ -127,5 +131,6 @@ TEST_F(ParserTest, ParseMultiple) {
     EXPECT_TRUE(node->children().empty());
   }
 
-  EXPECT_EQ(parser.Parse().status().message(), "Unexpected token '(end of input)' at 1:6.");
+  EXPECT_EQ(parser.Parse().status().message(),
+            "Unexpected token '(end of input)' at 1:6.");
 }

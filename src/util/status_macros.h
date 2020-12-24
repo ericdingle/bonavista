@@ -26,6 +26,6 @@
   do {                                              \
     auto _status = (expr);                          \
     EXPECT_TRUE(_status.ok()) << _status.message(); \
-  } while(false)
+  } while (false)
 
 #endif  // UTIL_STATUS_MACROS_H_

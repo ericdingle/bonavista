@@ -5,7 +5,7 @@
 
 class Token {
  public:
-  Token(int type, std::string_view value, int line, int column, int length=0);
+  Token(int type, std::string_view value, int line, int column, int length = 0);
 
   Token(const Token&) = default;
   Token& operator=(const Token&) = delete;

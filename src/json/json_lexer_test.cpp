@@ -1,27 +1,27 @@
-#include <utility>
 #include "json/json_lexer.h"
+
+#include <utility>
+
 #include "lexer/lexer_test_fixture.h"
 #include "lexer/token_test_macros.h"
 #include "third_party/absl/absl/strings/str_cat.h"
 #include "util/status_macros.h"
 
-class JsonLexerTest : public LexerTestFixture<JsonLexer> {
-};
+class JsonLexerTest : public LexerTestFixture<JsonLexer> {};
 
 TEST_F(JsonLexerTest, GetTokenUnexpected) {
-  EXPECT_EQ(GetToken(".").status().message(), "Unexpected character '.' at 1:2.");
-  EXPECT_EQ(GetToken("blah").status().message(), "Unexpected character 'b' at 1:2.");
+  EXPECT_EQ(GetToken(".").status().message(),
+            "Unexpected character '.' at 1:2.");
+  EXPECT_EQ(GetToken("blah").status().message(),
+            "Unexpected character 'b' at 1:2.");
 }
 
 TEST_F(JsonLexerTest, GetTokenOperators) {
   std::pair<const char*, JsonLexer::Type> test_cases[] = {
-      {":", JsonLexer::TYPE_COLON},
-      {",", JsonLexer::TYPE_COMMA},
-      {"{", JsonLexer::TYPE_LEFT_BRACE},
-      {"}", JsonLexer::TYPE_RIGHT_BRACE},
-      {"[", JsonLexer::TYPE_LEFT_BRACKET},
-      {"]", JsonLexer::TYPE_RIGHT_BRACKET},
-      };
+      {":", JsonLexer::TYPE_COLON},        {",", JsonLexer::TYPE_COMMA},
+      {"{", JsonLexer::TYPE_LEFT_BRACE},   {"}", JsonLexer::TYPE_RIGHT_BRACE},
+      {"[", JsonLexer::TYPE_LEFT_BRACKET}, {"]", JsonLexer::TYPE_RIGHT_BRACKET},
+  };
 
   for (const auto& test_case : test_cases) {
     const char* input = test_case.first;
@@ -33,24 +33,25 @@ TEST_F(JsonLexerTest, GetTokenKeyword) {
   const char* test_cases[] = {"false", "null", "true"};
 
   for (const char* test_case : test_cases) {
-    EXPECT_TOKEN(*GetToken(test_case).value(), JsonLexer::TYPE_KEYWORD, test_case, 1, 2);
+    EXPECT_TOKEN(*GetToken(test_case).value(), JsonLexer::TYPE_KEYWORD,
+                 test_case, 1, 2);
   }
 }
 
 TEST_F(JsonLexerTest, GetTokenNumber) {
   const char* test_cases[] = {
-    "0", "-0", "1", "-1", "12", "123",
-    "0.1", "-0.1", "12.3", "12.34",
-    "5e3", "32E-1", "120e+012",
+      "0",    "-0",   "1",     "-1",  "12",    "123",      "0.1",
+      "-0.1", "12.3", "12.34", "5e3", "32E-1", "120e+012",
   };
 
   for (const char* test_case : test_cases) {
-    EXPECT_TOKEN(*GetToken(test_case).value(), JsonLexer::TYPE_NUMBER, test_case, 1, 2);
+    EXPECT_TOKEN(*GetToken(test_case).value(), JsonLexer::TYPE_NUMBER,
+                 test_case, 1, 2);
   }
 }
 
 TEST_F(JsonLexerTest, GetTokenNumberError) {
-  const char* test_cases[] = { "-", "1.", "23e", "35E+" };
+  const char* test_cases[] = {"-", "1.", "23e", "35E+"};
 
   for (const char* test_case : test_cases) {
     EXPECT_EQ(GetToken(test_case).status().message(),
@@ -60,16 +61,11 @@ TEST_F(JsonLexerTest, GetTokenNumberError) {
 
 TEST_F(JsonLexerTest, GetTokenString) {
   std::pair<const char*, const char*> test_cases[] = {
-      {"\"test\"", "test"},
-      {"\"asdf jkl;\"", "asdf jkl;"},
-      {"\"test\\b\"", "test\\b"},
-      {"\"test\\f\"", "test\\f"},
-      {"\"test\\n\"", "test\\n"},
-      {"\"test\\r\"", "test\\r"},
-      {"\"test\\t\"", "test\\t"},
-      {"\"test\\u1234\"", "test\\u1234"},
-      {"\"test\\\\\"", "test\\\\"},
-      {"\"test\\/\"", "test\\/"},
+      {"\"test\"", "test"},         {"\"asdf jkl;\"", "asdf jkl;"},
+      {"\"test\\b\"", "test\\b"},   {"\"test\\f\"", "test\\f"},
+      {"\"test\\n\"", "test\\n"},   {"\"test\\r\"", "test\\r"},
+      {"\"test\\t\"", "test\\t"},   {"\"test\\u1234\"", "test\\u1234"},
+      {"\"test\\\\\"", "test\\\\"}, {"\"test\\/\"", "test\\/"},
       {"\"test\\\"\"", "test\\\""},
   };
 
@@ -82,12 +78,12 @@ TEST_F(JsonLexerTest, GetTokenString) {
 
 TEST_F(JsonLexerTest, GetTokenStringError) {
   std::pair<const char*, const char*> test_cases[] = {
-    {"\"test", "Unexpected character (end of input)"},
-    {"\"test\n", "Unexpected character '\n'"},
-    {"\"test\\", "Unexpected character (end of input)"},
-    {"\"test\\a", "Unexpected character 'a'"},
-    {"\"test\\u12", "Unexpected character (end of input)"},
-    {"\"test\\u123e", "Unexpected character 'e'"},
+      {"\"test", "Unexpected character (end of input)"},
+      {"\"test\n", "Unexpected character '\n'"},
+      {"\"test\\", "Unexpected character (end of input)"},
+      {"\"test\\a", "Unexpected character 'a'"},
+      {"\"test\\u12", "Unexpected character (end of input)"},
+      {"\"test\\u123e", "Unexpected character 'e'"},
   };
 
   for (const auto& test_case : test_cases) {

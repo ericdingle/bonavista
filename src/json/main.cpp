@@ -1,6 +1,8 @@
-#include <fstream>
 #include <stdio.h>
+
+#include <fstream>
 #include <string>
+
 #include "json/json_lexer.h"
 #include "json/json_parser.h"
 #include "lexer/token_stream.h"
@@ -41,7 +43,7 @@ void PrintJsonTree(const Node& node, int level) {
     printf("{");
     const auto& children = node.children();
     const char* comma = "";
-    for(uint i = 0; i < children.size(); i += 2) {
+    for (uint i = 0; i < children.size(); i += 2) {
       std::string_view value = children[i]->token().value();
       printf("%s\n%s  \"%.*s\": ", comma, indent.c_str(),
              static_cast<int>(value.size()), value.data());
@@ -56,7 +58,7 @@ void PrintJsonTree(const Node& node, int level) {
     printf("[");
     const auto& children = node.children();
     const char* comma = "";
-    for(uint i = 0; i < children.size(); ++i) {
+    for (uint i = 0; i < children.size(); ++i) {
       printf("%s\n%s  ", comma, indent.c_str());
       comma = ",";
       PrintJsonTree(*children[i], level + 1);

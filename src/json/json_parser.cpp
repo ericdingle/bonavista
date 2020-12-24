@@ -1,18 +1,17 @@
 #include "json/json_parser.h"
 
 #include <vector>
+
 #include "json/json_lexer.h"
 #include "parser/node.h"
 #include "util/status_macros.h"
 
-JsonParser::JsonParser(TokenStream* token_stream) : Parser(token_stream) {
-}
+JsonParser::JsonParser(TokenStream* token_stream) : Parser(token_stream) {}
 
 absl::StatusOr<std::unique_ptr<Node>> JsonParser::Parse() {
   ASSIGN_OR_RETURN(auto root, Parser::Parse());
 
-  if (HasInput())
-    return UnexpectedToken(*look_ahead_token_);
+  if (HasInput()) return UnexpectedToken(*look_ahead_token_);
 
   return std::move(root);
 }
@@ -52,8 +51,7 @@ absl::StatusOr<std::unique_ptr<Node>> JsonParser::ParseObject(
       ASSIGN_OR_RETURN(auto value, ParseExpression(0));
       node->AddChild(std::move(value));
 
-      if (!look_ahead_token_->IsType(JsonLexer::TYPE_COMMA))
-        break;
+      if (!look_ahead_token_->IsType(JsonLexer::TYPE_COMMA)) break;
       RETURN_IF_ERROR(ConsumeToken(JsonLexer::TYPE_COMMA));
     }
   }
@@ -76,8 +74,7 @@ absl::StatusOr<std::unique_ptr<Node>> JsonParser::ParseArray(
       ASSIGN_OR_RETURN(auto value, ParseExpression(0));
       node->AddChild(std::move(value));
 
-      if (!look_ahead_token_->IsType(JsonLexer::TYPE_COMMA))
-        break;
+      if (!look_ahead_token_->IsType(JsonLexer::TYPE_COMMA)) break;
       RETURN_IF_ERROR(ConsumeToken(JsonLexer::TYPE_COMMA));
     }
   }

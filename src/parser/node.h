@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "lexer/token.h"
 
 class Node {
@@ -13,7 +14,9 @@ class Node {
   ~Node();
 
   const Token& token() const { return *token_; };
-  const std::vector<std::unique_ptr<const Node>>& children() const { return children_; };
+  const std::vector<std::unique_ptr<const Node>>& children() const {
+    return children_;
+  };
 
   void AddChild(std::unique_ptr<const Node> node);
 

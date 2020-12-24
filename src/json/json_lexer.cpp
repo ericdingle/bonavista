@@ -1,6 +1,7 @@
 #include "json/json_lexer.h"
 
 #include <cstring>
+
 #include "util/status_macros.h"
 
 absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetToken(
@@ -53,30 +54,31 @@ absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetNumberToken(
     const char* input, int line, int column) const {
   const char* start = input;
 
-  if (*input == '-')
-    ++input;
+  if (*input == '-') ++input;
 
   RETURN_IF_ERROR(ExpectDigit(*input, line, column));
   if (*input == '0') {
     ++input;
   } else {
-    for (; IsDigit(*input); ++input);
+    for (; IsDigit(*input); ++input)
+      ;
   }
 
   if (*input == '.') {
     ++input;
     RETURN_IF_ERROR(ExpectDigit(*input, line, column));
-    for (; IsDigit(*input); ++input);
+    for (; IsDigit(*input); ++input)
+      ;
   }
 
   if (*input == 'e' || *input == 'E') {
     ++input;
 
-    if (*input == '-' || *input == '+')
-      ++input;
+    if (*input == '-' || *input == '+') ++input;
 
     RETURN_IF_ERROR(ExpectDigit(*input, line, column));
-    for (; IsDigit(*input); ++input);
+    for (; IsDigit(*input); ++input)
+      ;
   }
 
   return std::make_unique<Token>(
@@ -102,8 +104,8 @@ absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetStringToken(
       ++input;
 
       c = *input;
-      if (c == 'b' || c == 'f' || c == 'n' || c == 'r' || c == 't' || c == '"' ||
-          c == '\\' || c == '/') {
+      if (c == 'b' || c == 'f' || c == 'n' || c == 'r' || c == 't' ||
+          c == '"' || c == '\\' || c == '/') {
         // Nothing to do.
       } else if (c == 'u') {
         for (int i = 0; i < 4; ++i) {
@@ -118,7 +120,7 @@ absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetStringToken(
     ++input;
   }
 
-  return std::make_unique<Token>(
-      TYPE_STRING, std::string_view(start + 1, input - start - 2), line, column,
-      input - start);
+  return std::make_unique<Token>(TYPE_STRING,
+                                 std::string_view(start + 1, input - start - 2),
+                                 line, column, input - start);
 }

@@ -2,6 +2,7 @@
 #define PARSER_PARSER_TEST_FIXTURE_H_
 
 #include <memory>
+
 #include "lexer/token_stream.h"
 #include "parser/node.h"
 #include "third_party/absl/absl/status/statusor.h"

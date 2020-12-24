@@ -1,11 +1,10 @@
 #include "parser/parser.h"
 
 #include "lexer/lexer.h"
-#include "util/status_macros.h"
 #include "third_party/absl/absl/strings/str_cat.h"
+#include "util/status_macros.h"
 
-Parser::Parser(TokenStream* token_stream) : token_stream_(token_stream) {
-}
+Parser::Parser(TokenStream* token_stream) : token_stream_(token_stream) {}
 
 absl::StatusOr<std::unique_ptr<Node>> Parser::Parse() {
   if (!look_ahead_token_) {
@@ -20,9 +19,9 @@ absl::StatusOr<std::unique_ptr<Node>> Parser::Parse() {
 }
 
 bool Parser::HasInput() const {
-  return look_ahead_token_ ?
-      !look_ahead_token_->IsType(Lexer::TYPE_END_OF_INPUT) :
-      token_stream_->HasInput();
+  return look_ahead_token_
+             ? !look_ahead_token_->IsType(Lexer::TYPE_END_OF_INPUT)
+             : token_stream_->HasInput();
 }
 
 absl::Status Parser::ExpectToken(const Token& token, int type) {
@@ -30,8 +29,9 @@ absl::Status Parser::ExpectToken(const Token& token, int type) {
 }
 
 absl::Status Parser::UnexpectedToken(const Token& token) {
-  return absl::InvalidArgumentError(absl::StrCat(
-      "Unexpected token '", token.value(), "' at ", token.line(), ":", token.column(), "."));
+  return absl::InvalidArgumentError(
+      absl::StrCat("Unexpected token '", token.value(), "' at ", token.line(),
+                   ":", token.column(), "."));
 }
 
 absl::StatusOr<std::unique_ptr<Token>> Parser::GetNextToken() {
@@ -40,7 +40,8 @@ absl::StatusOr<std::unique_ptr<Token>> Parser::GetNextToken() {
   return std::move(token);
 }
 
-absl::StatusOr<std::unique_ptr<Node>> Parser::ParseExpression(int binding_power) {
+absl::StatusOr<std::unique_ptr<Node>> Parser::ParseExpression(
+    int binding_power) {
   ASSIGN_OR_RETURN(auto token, GetNextToken());
   ASSIGN_OR_RETURN(auto left, ParsePrefixToken(std::move(token)));
 
@@ -62,9 +63,7 @@ absl::Status Parser::ConsumeToken(int type) {
   return absl::OkStatus();
 }
 
-int Parser::GetBindingPower(int type) const {
-  return 0;
-}
+int Parser::GetBindingPower(int type) const { return 0; }
 
 absl::StatusOr<std::unique_ptr<Node>> Parser::ParseInfixToken(
     std::unique_ptr<const Token> token, std::unique_ptr<const Node> left) {
