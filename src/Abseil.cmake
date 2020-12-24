@@ -6,7 +6,7 @@ include(ExternalProject)
 ExternalProject_Add(abseil
   GIT_REPOSITORY    https://github.com/abseil/abseil-cpp.git
   GIT_TAG           master
-  SOURCE_DIR        "${CMAKE_CURRENT_SOURCE_DIR}/third_party/absl"
+  SOURCE_DIR        "${CMAKE_SOURCE_DIR}/third_party/absl"
   BINARY_DIR        ""
   CONFIGURE_COMMAND ""
   BUILD_COMMAND     ""

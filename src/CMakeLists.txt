@@ -17,11 +17,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # Abseil.
 configure_file(Abseil.cmake third_party/absl/CMakeLists.txt)
 execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/third_party/absl")
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/absl")
 execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/third_party/absl")
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/absl")
 add_subdirectory(third_party/absl EXCLUDE_FROM_ALL)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/absl)
+include_directories(${CMAKE_SOURCE_DIR}/third_party/absl)
 
 option(bonavista_tests "Whether to create test targets." ON)
 if (bonavista_tests)
@@ -30,9 +30,9 @@ if (bonavista_tests)
   # GoogleTest.
   configure_file(GoogleTest.cmake third_party/googletest/CMakeLists.txt)
   execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/third_party/googletest")
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/googletest")
   execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/third_party/googletest")
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/googletest")
   set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
   set(BUILD_GTEST ON CACHE BOOL "" FORCE)
   add_subdirectory(third_party/googletest EXCLUDE_FROM_ALL)
