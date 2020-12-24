@@ -1,8 +1,9 @@
 #include "json/json_lexer.h"
 
 #include <cstring>
+#include "util/status_macros.h"
 
-StatusOr<std::unique_ptr<Token>> JsonLexer::GetToken(
+absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetToken(
     std::string_view input, int line, int column) const {
   char c = input[0];
   if (IsAlpha(c)) {
@@ -32,10 +33,10 @@ StatusOr<std::unique_ptr<Token>> JsonLexer::GetToken(
     return std::make_unique<Token>(t, input.substr(0, 1), line, column);
   }
 
-  return UnexpectedCharacter(c, line, column);
+  return InvalidArgumentError(c, line, column);
 }
 
-StatusOr<std::unique_ptr<Token>> JsonLexer::GetKeywordToken(
+absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetKeywordToken(
     const char* input, int line, int column) const {
   if (strncmp(input, "false", 5) == 0) {
     return std::make_unique<Token>(TYPE_KEYWORD, "false", line, column);
@@ -45,10 +46,10 @@ StatusOr<std::unique_ptr<Token>> JsonLexer::GetKeywordToken(
     return std::make_unique<Token>(TYPE_KEYWORD, "true", line, column);
   }
 
-  return UnexpectedCharacter(*input, line, column);
+  return InvalidArgumentError(*input, line, column);
 }
 
-StatusOr<std::unique_ptr<Token>> JsonLexer::GetNumberToken(
+absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetNumberToken(
     const char* input, int line, int column) const {
   const char* start = input;
 
@@ -82,7 +83,7 @@ StatusOr<std::unique_ptr<Token>> JsonLexer::GetNumberToken(
       TYPE_NUMBER, std::string_view(start, input - start), line, column);
 }
 
-StatusOr<std::unique_ptr<Token>> JsonLexer::GetStringToken(
+absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetStringToken(
     const char* input, int line, int column) const {
   const char* start = input;
   ++input;
@@ -110,7 +111,7 @@ StatusOr<std::unique_ptr<Token>> JsonLexer::GetStringToken(
           RETURN_IF_ERROR(ExpectDigit(*input, line, column));
         }
       } else {
-        return UnexpectedCharacter(c, line, column);
+        return InvalidArgumentError(c, line, column);
       }
     }
 

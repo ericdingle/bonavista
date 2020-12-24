@@ -3,11 +3,12 @@
 #include <vector>
 #include "json/json_lexer.h"
 #include "parser/node.h"
+#include "util/status_macros.h"
 
 JsonParser::JsonParser(TokenStream* token_stream) : Parser(token_stream) {
 }
 
-StatusOr<std::unique_ptr<Node>> JsonParser::Parse() {
+absl::StatusOr<std::unique_ptr<Node>> JsonParser::Parse() {
   ASSIGN_OR_RETURN(auto root, Parser::Parse());
 
   if (HasInput())
@@ -16,7 +17,7 @@ StatusOr<std::unique_ptr<Node>> JsonParser::Parse() {
   return std::move(root);
 }
 
-StatusOr<std::unique_ptr<Node>> JsonParser::ParsePrefixToken(
+absl::StatusOr<std::unique_ptr<Node>> JsonParser::ParsePrefixToken(
     std::unique_ptr<const Token> token) {
   if (token->IsType(JsonLexer::TYPE_LEFT_BRACE))
     return ParseObject(std::move(token));
@@ -31,14 +32,14 @@ StatusOr<std::unique_ptr<Node>> JsonParser::ParsePrefixToken(
   return UnexpectedToken(*token);
 }
 
-StatusOr<std::unique_ptr<Node>> JsonParser::ParseObject(
+absl::StatusOr<std::unique_ptr<Node>> JsonParser::ParseObject(
     std::unique_ptr<const Token> token) {
   // Implements:
   //  object -> '{' pairs '}'
   //  pair -> string ':' value
   //  pairs -> pair more_pairs | E
   //  more_pairs -> ',' pair more_pairs | E
-  auto node = std::make_unique_ptr<Node>(std::move(token));
+  auto node = std::make_unique<Node>(std::move(token));
 
   if (!look_ahead_token_->IsType(JsonLexer::TYPE_RIGHT_BRACE)) {
     while (true) {
@@ -62,7 +63,7 @@ StatusOr<std::unique_ptr<Node>> JsonParser::ParseObject(
   return std::move(node);
 }
 
-StatusOr<std::unique_ptr<Node>> JsonParser::ParseArray(
+absl::StatusOr<std::unique_ptr<Node>> JsonParser::ParseArray(
     std::unique_ptr<const Token> token) {
   // Implements:
   //   array -> '[' values ']'

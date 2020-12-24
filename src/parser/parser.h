@@ -6,7 +6,7 @@
 #include "lexer/token.h"
 #include "lexer/token_stream.h"
 #include "parser/node.h"
-#include "util/status_or.h"
+#include "third_party/absl/absl/status/statusor.h"
 #include "third_party/googletest/googletest/include/gtest/gtest_prod.h"
 
 class Parser {
@@ -16,22 +16,22 @@ class Parser {
   Parser& operator=(const Parser&) = delete;
   virtual ~Parser() = default;
 
-  virtual StatusOr<std::unique_ptr<Node>> Parse();
+  virtual absl::StatusOr<std::unique_ptr<Node>> Parse();
 
   bool HasInput() const;
 
  protected:
-  static Status ExpectToken(const Token& token, int type);
-  static Status UnexpectedToken(const Token& token);
+  static absl::Status ExpectToken(const Token& token, int type);
+  static absl::Status UnexpectedToken(const Token& token);
 
-  StatusOr<std::unique_ptr<Token>> GetNextToken();
-  StatusOr<std::unique_ptr<Node>> ParseExpression(int binding_power);
-  Status ConsumeToken(int type);
+  absl::StatusOr<std::unique_ptr<Token>> GetNextToken();
+  absl::StatusOr<std::unique_ptr<Node>> ParseExpression(int binding_power);
+  absl::Status ConsumeToken(int type);
 
   virtual int GetBindingPower(int type) const;
-  virtual StatusOr<std::unique_ptr<Node>> ParsePrefixToken(
+  virtual absl::StatusOr<std::unique_ptr<Node>> ParsePrefixToken(
       std::unique_ptr<const Token> token) = 0;
-  virtual StatusOr<std::unique_ptr<Node>> ParseInfixToken(
+  virtual absl::StatusOr<std::unique_ptr<Node>> ParseInfixToken(
       std::unique_ptr<const Token> token, std::unique_ptr<const Node> left);
 
   std::unique_ptr<Token> look_ahead_token_;

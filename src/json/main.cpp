@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
   TokenStream stream(lexer, buffer);
 
   JsonParser parser(&stream);
-  StatusOr<std::unique_ptr<Node>> status_or = parser.Parse();
+  absl::StatusOr<std::unique_ptr<Node>> status_or = parser.Parse();
   if (!status_or.ok()) {
     printf("Error: %s\n", status_or.status().ToString().c_str());
     return 1;

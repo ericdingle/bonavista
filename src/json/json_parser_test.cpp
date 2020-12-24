@@ -4,17 +4,17 @@
 #include "json/json_parser.h"
 #include "parser/node.h"
 #include "parser/parser_test_fixture.h"
-#include "util/status_test_macros.h"
+#include "util/status_macros.h"
 
 class JsonParserTest : public ParserTestFixture<JsonLexer, JsonParser> {
 };
 
 TEST_F(JsonParserTest, ParseEmpty) {
-  EXPECT_STATUS(Parse("").status(), "Unexpected token: (end of input)", 1, 1);
+  EXPECT_EQ(Parse("").status().message(), "Unexpected token '(end of input)' at 1:1.");
 }
 
 TEST_F(JsonParserTest, ParseUnknown) {
-  EXPECT_STATUS(Parse("blah").status(), "Unexpected character: b", 1, 1);
+  EXPECT_EQ(Parse("blah").status().message(), "Unexpected character 'b' at 1:1.");
 }
 
 TEST_F(JsonParserTest, ParsePrimitive) {
@@ -38,12 +38,12 @@ TEST_F(JsonParserTest, ParseObject) {
 }
 
 TEST_F(JsonParserTest, ParseObjectError) {
-  EXPECT_STATUS(Parse("{, \"a\": 1}").status(), "Unexpected token: ,", 1, 2);
-  EXPECT_STATUS(Parse("{1: false}").status(), "Unexpected token: 1", 1, 2);
-  EXPECT_STATUS(Parse("{\"a\", false}").status(), "Unexpected token: ,", 1, 5);
-  EXPECT_STATUS(Parse("{\"a\": }").status(), "Unexpected token: }", 1, 7);
-  EXPECT_STATUS(Parse("{\"a\": false").status(),
-                "Unexpected token: (end of input)", 1, 12);
+  EXPECT_EQ(Parse("{, \"a\": 1}").status().message(), "Unexpected token ',' at 1:2.");
+  EXPECT_EQ(Parse("{1: false}").status().message(), "Unexpected token '1' at 1:2.");
+  EXPECT_EQ(Parse("{\"a\", false}").status().message(), "Unexpected token ',' at 1:5.");
+  EXPECT_EQ(Parse("{\"a\": }").status().message(), "Unexpected token '}' at 1:7.");
+  EXPECT_EQ(Parse("{\"a\": false").status().message(),
+                "Unexpected token '(end of input)' at 1:12.");
 }
 
 TEST_F(JsonParserTest, ParseArray) {
@@ -60,12 +60,12 @@ TEST_F(JsonParserTest, ParseArray) {
 }
 
 TEST_F(JsonParserTest, ParseArrayError) {
-  EXPECT_STATUS(Parse("[, false]").status(), "Unexpected token: ,", 1, 2);
-  EXPECT_STATUS(Parse("[1, false, null").status(),
-                "Unexpected token: (end of input)", 1, 16);
+  EXPECT_EQ(Parse("[, false]").status().message(), "Unexpected token ',' at 1:2.");
+  EXPECT_EQ(Parse("[1, false, null").status().message(),
+                "Unexpected token '(end of input)' at 1:16.");
 }
 
 TEST_F(JsonParserTest, ParseMultipleExpressions) {
-  EXPECT_STATUS(Parse("1 false").status(), "Unexpected token: false", 1, 3);
-  EXPECT_STATUS(Parse("1 blah").status(), "Unexpected character: b", 1, 3);
+  EXPECT_EQ(Parse("1 false").status().message(), "Unexpected token 'false' at 1:3.");
+  EXPECT_EQ(Parse("1 blah").status().message(), "Unexpected character 'b' at 1:3.");
 }

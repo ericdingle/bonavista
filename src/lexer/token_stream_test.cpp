@@ -3,7 +3,7 @@
 #include <memory>
 #include "lexer/lexer.h"
 #include "lexer/token_test_macros.h"
-#include "util/status_test_macros.h"
+#include "third_party/absl/absl/strings/str_cat.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 class TestLexer : public Lexer {
@@ -12,10 +12,10 @@ class TestLexer : public Lexer {
     TYPE_CHAR
   };
 
-  StatusOr<std::unique_ptr<Token>> GetToken(
+  absl::StatusOr<std::unique_ptr<Token>> GetToken(
       std::string_view input, int line, int column) const override {
     if (input[0] == 'f') {
-      return Status("fail", line, column);
+      return absl::InvalidArgumentError(absl::StrCat("fail at ", line, ":", column, "."));
     } else {
       return std::make_unique<Token>(TYPE_CHAR, input.substr(0, 1), line,
                                      column);
@@ -52,5 +52,5 @@ TEST_F(TokenStreamTest, GetNextTokenError) {
   TestLexer lexer;
   TokenStream token_stream(lexer, "f");
   EXPECT_TRUE(token_stream.HasInput());
-  EXPECT_STATUS(token_stream.GetNextToken().status(), "fail", 1, 1);
+  EXPECT_EQ(token_stream.GetNextToken().status().message(), "fail at 1:1.");
 }

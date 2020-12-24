@@ -1,12 +1,13 @@
 #include "lexer/token_stream.h"
 
 #include "lexer/lexer.h"
+#include "util/status_macros.h"
 
 TokenStream::TokenStream(const Lexer& lexer, std::string_view input)
     : lexer_(lexer), input_(input), index_(0), line_(1), column_(1) {
 }
 
-StatusOr<std::unique_ptr<Token>> TokenStream::GetNextToken() {
+absl::StatusOr<std::unique_ptr<Token>> TokenStream::GetNextToken() {
   // Consume the white space.
   while (HasInput()) {
     char c = input_[index_];

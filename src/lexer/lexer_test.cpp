@@ -1,6 +1,6 @@
 #include "lexer/lexer.h"
-#include "util/status_test_macros.h"
 #include "third_party/googletest/googletest/include/gtest/gtest.h"
+#include "util/status_macros.h"
 
 TEST(LexerTest, IsAlpha) {
   EXPECT_TRUE(Lexer::IsAlpha('a'));
@@ -25,21 +25,22 @@ TEST(LexerTest, IsDigit) {
 
 TEST(LexerTest, ExpectDigit) {
   EXPECT_OK(Lexer::ExpectDigit('0', 1, 2));
-  EXPECT_STATUS(Lexer::ExpectDigit('a', 1, 2), "Unexpected character: a", 1, 2);
-  EXPECT_STATUS(Lexer::ExpectDigit('\0', 1, 2), "Unexpected end of input", 1, 2);
+  EXPECT_EQ(Lexer::ExpectDigit('a', 1, 2).message(),
+            "Unexpected character 'a' at 1:2.");
+  EXPECT_EQ(Lexer::ExpectDigit('\0', 1, 2).message(),
+            "Unexpected character (end of input) at 1:2.");
 }
 
 TEST(LexerTest, ExpectNotControl) {
   EXPECT_OK(Lexer::ExpectNotControl('0', 1, 2));
-  EXPECT_STATUS(Lexer::ExpectNotControl('\n', 1, 2), "Unexpected character: \n", 1, 2);
-  EXPECT_STATUS(Lexer::ExpectNotControl('\0', 1, 2), "Unexpected end of input", 1, 2);
+  EXPECT_EQ(Lexer::ExpectNotControl('\n', 1, 2).message(),
+            "Unexpected character '\n' at 1:2.");
+  EXPECT_EQ(Lexer::ExpectNotControl('\0', 1, 2).message(),
+            "Unexpected character (end of input) at 1:2.");
 }
 
 TEST(LexerTest, ExpectNotNull) {
   EXPECT_OK(Lexer::ExpectNotControl('0', 1, 2));
-  EXPECT_STATUS(Lexer::ExpectNotControl('\0', 1, 2), "Unexpected end of input", 1, 2);
-}
-
-TEST(LexerTest, UnexpectedCharacter) {
-  EXPECT_STATUS(Lexer::UnexpectedCharacter('0', 1, 2), "Unexpected character: 0", 1, 2);
+  EXPECT_EQ(Lexer::ExpectNotControl('\0', 1, 2).message(),
+            "Unexpected character (end of input) at 1:2.");
 }

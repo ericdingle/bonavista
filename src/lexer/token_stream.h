@@ -5,7 +5,7 @@
 #include <string_view>
 #include "lexer/lexer.h"
 #include "lexer/token.h"
-#include "util/status_or.h"
+#include "third_party/absl/absl/status/statusor.h"
 
 class TokenStream {
  public:
@@ -14,7 +14,7 @@ class TokenStream {
   TokenStream& operator=(const TokenStream&) = delete;
   ~TokenStream() = default;
 
-  StatusOr<std::unique_ptr<Token>> GetNextToken();
+  absl::StatusOr<std::unique_ptr<Token>> GetNextToken();
 
   bool HasInput() const;
 

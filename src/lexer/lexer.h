@@ -4,7 +4,8 @@
 #include <memory>
 #include <string_view>
 #include "lexer/token.h"
-#include "util/status_or.h"
+#include "third_party/absl/absl/status/status.h"
+#include "third_party/absl/absl/status/statusor.h"
 #include "third_party/googletest/googletest/include/gtest/gtest_prod.h"
 
 class Lexer {
@@ -16,18 +17,18 @@ class Lexer {
   Lexer& operator=(const Lexer&) = delete;
   virtual ~Lexer() = default;
 
-  virtual StatusOr<std::unique_ptr<Token>> GetToken(
+  virtual absl::StatusOr<std::unique_ptr<Token>> GetToken(
       std::string_view input, int line, int column) const = 0;
 
  protected:
   static bool IsAlpha(char c);
   static bool IsDigit(char c);
 
-  static Status ExpectDigit(char c, int line, int column);
-  static Status ExpectNotControl(char c, int line, int column);
-  static Status ExpectNotNull(char c, int line, int column);
+  static absl::Status ExpectDigit(char c, int line, int column);
+  static absl::Status ExpectNotControl(char c, int line, int column);
+  static absl::Status ExpectNotNull(char c, int line, int column);
 
-  static Status UnexpectedCharacter(char c, int line, int column);
+  static absl::Status InvalidArgumentError(char c, int line, int column);
 
  private:
   FRIEND_TEST(LexerTest, IsAlpha);

@@ -22,15 +22,15 @@ class JsonLexer : public Lexer {
     TYPE_STRING
   };
 
-  StatusOr<std::unique_ptr<Token>> GetToken(
+  absl::StatusOr<std::unique_ptr<Token>> GetToken(
       std::string_view input, int line, int column) const override;
 
  private:
-  StatusOr<std::unique_ptr<Token>> GetKeywordToken(
+  absl::StatusOr<std::unique_ptr<Token>> GetKeywordToken(
       const char* input, int line, int column) const;
-  StatusOr<std::unique_ptr<Token>> GetNumberToken(
+  absl::StatusOr<std::unique_ptr<Token>> GetNumberToken(
       const char* input, int line, int column) const;
-  StatusOr<std::unique_ptr<Token>> GetStringToken(
+  absl::StatusOr<std::unique_ptr<Token>> GetStringToken(
       const char* input, int line, int column) const;
 };
 

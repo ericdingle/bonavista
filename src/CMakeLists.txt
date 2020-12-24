@@ -14,6 +14,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Include relative to current source dir.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+# Abseil.
+configure_file(Abseil.cmake third_party/absl/CMakeLists.txt)
+execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/third_party/absl")
+execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/third_party/absl")
+add_subdirectory(third_party/absl)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/absl)
+
 option(bonavista_tests "Whether to create test targets." ON)
 if (bonavista_tests)
   enable_testing()
@@ -32,4 +41,3 @@ endif()
 add_subdirectory(json EXCLUDE_FROM_ALL)
 add_subdirectory(lexer)
 add_subdirectory(parser)
-add_subdirectory(util)

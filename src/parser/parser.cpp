@@ -1,11 +1,13 @@
 #include "parser/parser.h"
 
 #include "lexer/lexer.h"
+#include "util/status_macros.h"
+#include "third_party/absl/absl/strings/str_cat.h"
 
 Parser::Parser(TokenStream* token_stream) : token_stream_(token_stream) {
 }
 
-StatusOr<std::unique_ptr<Node>> Parser::Parse() {
+absl::StatusOr<std::unique_ptr<Node>> Parser::Parse() {
   if (!look_ahead_token_) {
     ASSIGN_OR_RETURN(auto token, GetNextToken());
   }
@@ -23,22 +25,22 @@ bool Parser::HasInput() const {
       token_stream_->HasInput();
 }
 
-Status Parser::ExpectToken(const Token& token, int type) {
-  return token.IsType(type) ? Status() : UnexpectedToken(token);
+absl::Status Parser::ExpectToken(const Token& token, int type) {
+  return token.IsType(type) ? absl::OkStatus() : UnexpectedToken(token);
 }
 
-Status Parser::UnexpectedToken(const Token& token) {
-  return Status(std::string("Unexpected token: ") + std::string(token.value()),
-                token.line(), token.column());
+absl::Status Parser::UnexpectedToken(const Token& token) {
+  return absl::InvalidArgumentError(absl::StrCat(
+      "Unexpected token '", token.value(), "' at ", token.line(), ":", token.column(), "."));
 }
 
-StatusOr<std::unique_ptr<Token>> Parser::GetNextToken() {
+absl::StatusOr<std::unique_ptr<Token>> Parser::GetNextToken() {
   auto token = std::move(look_ahead_token_);
   ASSIGN_OR_RETURN(look_ahead_token_, token_stream_->GetNextToken());
   return std::move(token);
 }
 
-StatusOr<std::unique_ptr<Node>> Parser::ParseExpression(int binding_power) {
+absl::StatusOr<std::unique_ptr<Node>> Parser::ParseExpression(int binding_power) {
   ASSIGN_OR_RETURN(auto token, GetNextToken());
   ASSIGN_OR_RETURN(auto left, ParsePrefixToken(std::move(token)));
 
@@ -50,21 +52,21 @@ StatusOr<std::unique_ptr<Node>> Parser::ParseExpression(int binding_power) {
   return std::move(left);
 }
 
-Status Parser::ConsumeToken(int type) {
+absl::Status Parser::ConsumeToken(int type) {
   ASSIGN_OR_RETURN(auto token, GetNextToken());
 
   if (!token->IsType(type)) {
     return UnexpectedToken(*token);
   }
 
-  return Status();
+  return absl::OkStatus();
 }
 
 int Parser::GetBindingPower(int type) const {
   return 0;
 }
 
-StatusOr<std::unique_ptr<Node>> Parser::ParseInfixToken(
+absl::StatusOr<std::unique_ptr<Node>> Parser::ParseInfixToken(
     std::unique_ptr<const Token> token, std::unique_ptr<const Node> left) {
   return UnexpectedToken(*token);
 }

@@ -2,14 +2,15 @@
 #include "json/json_lexer.h"
 #include "lexer/lexer_test_fixture.h"
 #include "lexer/token_test_macros.h"
-#include "util/status_test_macros.h"
+#include "third_party/absl/absl/strings/str_cat.h"
+#include "util/status_macros.h"
 
 class JsonLexerTest : public LexerTestFixture<JsonLexer> {
 };
 
 TEST_F(JsonLexerTest, GetTokenUnexpected) {
-  EXPECT_STATUS(GetToken(".").status(), "Unexpected character: .", 1, 2);
-  EXPECT_STATUS(GetToken("blah").status(), "Unexpected character: b", 1, 2);
+  EXPECT_EQ(GetToken(".").status().message(), "Unexpected character '.' at 1:2.");
+  EXPECT_EQ(GetToken("blah").status().message(), "Unexpected character 'b' at 1:2.");
 }
 
 TEST_F(JsonLexerTest, GetTokenOperators) {
@@ -52,7 +53,8 @@ TEST_F(JsonLexerTest, GetTokenNumberError) {
   const char* test_cases[] = { "-", "1.", "23e", "35E+" };
 
   for (const char* test_case : test_cases) {
-    EXPECT_STATUS(GetToken(test_case).status(), "Unexpected end of input", 1, 2);
+    EXPECT_EQ(GetToken(test_case).status().message(),
+              "Unexpected character (end of input) at 1:2.");
   }
 }
 
@@ -80,15 +82,16 @@ TEST_F(JsonLexerTest, GetTokenString) {
 
 TEST_F(JsonLexerTest, GetTokenStringError) {
   std::pair<const char*, const char*> test_cases[] = {
-    {"\"test", "Unexpected end of input"},
-    {"\"test\n", "Unexpected character: \n"},
-    {"\"test\\", "Unexpected end of input"},
-    {"\"test\\a", "Unexpected character: a"},
-    {"\"test\\u12", "Unexpected end of input"},
-    {"\"test\\u123e", "Unexpected character: e"},
+    {"\"test", "Unexpected character (end of input)"},
+    {"\"test\n", "Unexpected character '\n'"},
+    {"\"test\\", "Unexpected character (end of input)"},
+    {"\"test\\a", "Unexpected character 'a'"},
+    {"\"test\\u12", "Unexpected character (end of input)"},
+    {"\"test\\u123e", "Unexpected character 'e'"},
   };
 
   for (const auto& test_case : test_cases) {
-    EXPECT_STATUS(GetToken(test_case.first).status(), test_case.second, 1, 2);
+    EXPECT_EQ(GetToken(test_case.first).status().message(),
+              absl::StrCat(test_case.second, " at 1:2."));
   }
 }

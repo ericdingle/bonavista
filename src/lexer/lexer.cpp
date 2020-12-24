@@ -1,5 +1,7 @@
 #include "lexer/lexer.h"
 
+#include "third_party/absl/absl/strings/str_cat.h"
+
 const int Lexer::TYPE_END_OF_INPUT = -1;
 
 bool Lexer::IsAlpha(char c) {
@@ -10,23 +12,23 @@ bool Lexer::IsDigit(char c) {
   return c >= '0' && c <= '9';
 }
 
-Status Lexer::ExpectDigit(char c, int line, int column) {
-  RETURN_IF_ERROR(ExpectNotNull(c, line, column));
-  return !IsDigit(c) ? UnexpectedCharacter(c, line, column) : Status();
+absl::Status Lexer::ExpectDigit(char c, int line, int column) {
+  return !IsDigit(c) ? InvalidArgumentError(c, line, column) : absl::OkStatus();
 }
 
-Status Lexer::ExpectNotNull(char c, int line, int column) {
-  return !c ? Status("Unexpected end of input", line, column) : Status();
-}
-
-
-Status Lexer::ExpectNotControl(char c, int line, int column) {
-  RETURN_IF_ERROR(ExpectNotNull(c, line, column));
-  return c < ' ' ? UnexpectedCharacter(c, line, column) : Status();
+absl::Status Lexer::ExpectNotNull(char c, int line, int column) {
+  return !c ? InvalidArgumentError(c, line, column) : absl::OkStatus();
 }
 
 
-Status Lexer::UnexpectedCharacter(char c, int line, int column) {
-  RETURN_IF_ERROR(ExpectNotNull(c, line, column));
-  return Status(std::string("Unexpected character: ") + c, line, column);
+absl::Status Lexer::ExpectNotControl(char c, int line, int column) {
+  return c < ' ' ? InvalidArgumentError(c, line, column) : absl::OkStatus();
+}
+
+
+absl::Status Lexer::InvalidArgumentError(char c, int line, int column) {
+  return absl::InvalidArgumentError(absl::StrCat(
+      "Unexpected character ",
+      c ? absl::StrCat("'", std::string(1, c), "'") : "(end of input)",
+      " at ", line, ":", column, "."));
 }

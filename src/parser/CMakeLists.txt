@@ -1,5 +1,5 @@
 add_library(parser_lib node.cpp node.h parser.cpp parser.h)
-target_link_libraries(parser_lib lexer_lib util_lib)
+target_link_libraries(parser_lib lexer_lib absl::status absl::statusor)
 target_include_directories(parser_lib INTERFACE ${bonavista_SOURCE_DIR})
 
 if (bonavista_tests)
