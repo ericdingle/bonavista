@@ -20,7 +20,7 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/absl")
 execute_process(COMMAND "${CMAKE_COMMAND}" --build .
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/absl")
-add_subdirectory(third_party/absl EXCLUDE_FROM_ALL)
+add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/absl EXCLUDE_FROM_ALL)
 include_directories(${CMAKE_SOURCE_DIR}/third_party/absl)
 
 option(bonavista_tests "Whether to create test targets." ON)
@@ -35,7 +35,7 @@ if (bonavista_tests)
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/googletest")
   set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
   set(BUILD_GTEST ON CACHE BOOL "" FORCE)
-  add_subdirectory(third_party/googletest EXCLUDE_FROM_ALL)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/googletest EXCLUDE_FROM_ALL)
 endif()
 
 add_subdirectory(json)
