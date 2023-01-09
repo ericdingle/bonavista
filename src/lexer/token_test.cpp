@@ -1,7 +1,8 @@
 #include "lexer/token.h"
 
+#include <gtest/gtest.h>
+
 #include "lexer/token_test_macros.h"
-#include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 TEST(TokenTest, Constructor) {
   Token token(1, "lazy4", 12, 54);

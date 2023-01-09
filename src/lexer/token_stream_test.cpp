@@ -1,11 +1,10 @@
 #include "lexer/token_stream.h"
 
-#include <memory>
+#include <gtest/gtest.h>
 
+#include "absl/strings/str_cat.h"
 #include "lexer/lexer.h"
 #include "lexer/token_test_macros.h"
-#include "third_party/absl/absl/strings/str_cat.h"
-#include "third_party/googletest/googletest/include/gtest/gtest.h"
 
 class TestLexer : public Lexer {
  public:

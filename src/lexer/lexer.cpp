@@ -1,6 +1,6 @@
 #include "lexer/lexer.h"
 
-#include "third_party/absl/absl/strings/str_cat.h"
+#include "absl/strings/str_cat.h"
 
 const int Lexer::TYPE_END_OF_INPUT = -1;
 

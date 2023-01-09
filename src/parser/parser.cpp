@@ -1,7 +1,7 @@
 #include "parser/parser.h"
 
+#include "absl/strings/str_cat.h"
 #include "lexer/lexer.h"
-#include "third_party/absl/absl/strings/str_cat.h"
 #include "util/status_macros.h"
 
 Parser::Parser(TokenStream* token_stream) : token_stream_(token_stream) {}

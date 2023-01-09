@@ -1,13 +1,13 @@
 #ifndef LEXER_LEXER_H_
 #define LEXER_LEXER_H_
 
+#include <gtest/gtest.h>
 #include <memory>
 #include <string_view>
 
+#include "absl/status/status.h"
+#include "absl/status/statusor.h"
 #include "lexer/token.h"
-#include "third_party/absl/absl/status/status.h"
-#include "third_party/absl/absl/status/statusor.h"
-#include "third_party/googletest/googletest/include/gtest/gtest_prod.h"
 
 class Lexer {
  public:

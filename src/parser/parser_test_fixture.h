@@ -1,12 +1,12 @@
 #ifndef PARSER_PARSER_TEST_FIXTURE_H_
 #define PARSER_PARSER_TEST_FIXTURE_H_
 
+#include <gtest/gtest.h>
 #include <memory>
 
 #include "lexer/token_stream.h"
 #include "parser/node.h"
-#include "third_party/absl/absl/status/statusor.h"
-#include "third_party/googletest/googletest/include/gtest/gtest.h"
+#include "absl/status/statusor.h"
 
 template <typename LexerT, typename ParserT>
 class ParserTestFixture : public testing::Test {

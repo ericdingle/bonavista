@@ -2,9 +2,9 @@
 
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "lexer/lexer_test_fixture.h"
 #include "lexer/token_test_macros.h"
-#include "third_party/absl/absl/strings/str_cat.h"
 #include "util/status_macros.h"
 
 class JsonLexerTest : public LexerTestFixture<JsonLexer> {};

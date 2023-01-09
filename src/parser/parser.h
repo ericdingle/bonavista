@@ -1,14 +1,14 @@
 #ifndef PARSER_PARSER_H_
 #define PARSER_PARSER_H_
 
+#include <gtest/gtest.h>
 #include <memory>
 #include <string>
 
+#include "absl/status/statusor.h"
 #include "lexer/token.h"
 #include "lexer/token_stream.h"
 #include "parser/node.h"
-#include "third_party/absl/absl/status/statusor.h"
-#include "third_party/googletest/googletest/include/gtest/gtest_prod.h"
 
 class Parser {
  public:

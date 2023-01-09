@@ -4,9 +4,9 @@
 #include <memory>
 #include <string_view>
 
+#include "absl/status/statusor.h"
 #include "lexer/lexer.h"
 #include "lexer/token.h"
-#include "third_party/absl/absl/status/statusor.h"
 
 class TokenStream {
  public:
