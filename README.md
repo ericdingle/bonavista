@@ -1,3 +1,3 @@
 # bonavista
 
-A tokenizer and parser library written in C++.
+A interpreter library written in C++.
