@@ -55,7 +55,7 @@ TEST_F(JsonLexerTest, GetTokenNumberError) {
 
   for (const char* test_case : test_cases) {
     EXPECT_EQ(GetToken(test_case).status().message(),
-              "Unexpected character (end of input) at 1:2.");
+              "Unexpected character '(end of input)' at 1:2.");
   }
 }
 
@@ -78,11 +78,11 @@ TEST_F(JsonLexerTest, GetTokenString) {
 
 TEST_F(JsonLexerTest, GetTokenStringError) {
   std::pair<const char*, const char*> test_cases[] = {
-      {"\"test", "Unexpected character (end of input)"},
+      {"\"test", "Unexpected character '(end of input)'"},
       {"\"test\n", "Unexpected character '\n'"},
-      {"\"test\\", "Unexpected character (end of input)"},
+      {"\"test\\", "Unexpected character '(end of input)'"},
       {"\"test\\a", "Unexpected character 'a'"},
-      {"\"test\\u12", "Unexpected character (end of input)"},
+      {"\"test\\u12", "Unexpected character '(end of input)'"},
       {"\"test\\u123e", "Unexpected character 'e'"},
   };
 

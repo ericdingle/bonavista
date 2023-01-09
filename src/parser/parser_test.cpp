@@ -20,7 +20,7 @@ class TestLexer : public Lexer {
       return std::make_unique<Token>(TYPE_DIGIT, input.substr(0, 1), line,
                                      column);
     }
-    return InvalidArgumentError(input[0], line, column);
+    return UnexpectedCharacterError(input[0], line, column);
   }
 };
 

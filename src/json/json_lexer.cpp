@@ -34,7 +34,7 @@ absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetToken(
     return std::make_unique<Token>(t, input.substr(0, 1), line, column);
   }
 
-  return InvalidArgumentError(c, line, column);
+  return UnexpectedCharacterError(c, line, column);
 }
 
 absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetKeywordToken(
@@ -47,7 +47,7 @@ absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetKeywordToken(
     return std::make_unique<Token>(TYPE_KEYWORD, "true", line, column);
   }
 
-  return InvalidArgumentError(*input, line, column);
+  return UnexpectedCharacterError(*input, line, column);
 }
 
 absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetNumberToken(
@@ -113,7 +113,7 @@ absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetStringToken(
           RETURN_IF_ERROR(ExpectDigit(*input, line, column));
         }
       } else {
-        return InvalidArgumentError(c, line, column);
+        return UnexpectedCharacterError(c, line, column);
       }
     }
 

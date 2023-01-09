@@ -30,7 +30,7 @@ TEST(LexerTest, ExpectDigit) {
   EXPECT_EQ(Lexer::ExpectDigit('a', 1, 2).message(),
             "Unexpected character 'a' at 1:2.");
   EXPECT_EQ(Lexer::ExpectDigit('\0', 1, 2).message(),
-            "Unexpected character (end of input) at 1:2.");
+            "Unexpected character '(end of input)' at 1:2.");
 }
 
 TEST(LexerTest, ExpectNotControl) {
@@ -38,11 +38,11 @@ TEST(LexerTest, ExpectNotControl) {
   EXPECT_EQ(Lexer::ExpectNotControl('\n', 1, 2).message(),
             "Unexpected character '\n' at 1:2.");
   EXPECT_EQ(Lexer::ExpectNotControl('\0', 1, 2).message(),
-            "Unexpected character (end of input) at 1:2.");
+            "Unexpected character '(end of input)' at 1:2.");
 }
 
 TEST(LexerTest, ExpectNotNull) {
   EXPECT_OK(Lexer::ExpectNotControl('0', 1, 2));
   EXPECT_EQ(Lexer::ExpectNotControl('\0', 1, 2).message(),
-            "Unexpected character (end of input) at 1:2.");
+            "Unexpected character '(end of input)' at 1:2.");
 }

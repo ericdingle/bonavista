@@ -29,7 +29,7 @@ class Lexer {
   static absl::Status ExpectNotControl(char c, int line, int column);
   static absl::Status ExpectNotNull(char c, int line, int column);
 
-  static absl::Status InvalidArgumentError(char c, int line, int column);
+  static absl::Status UnexpectedCharacterError(char c, int line, int column);
 
  private:
   FRIEND_TEST(LexerTest, IsAlpha);

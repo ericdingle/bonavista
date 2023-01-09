@@ -6,6 +6,7 @@ cc_library(
     srcs = ["lexer.cpp"],
     deps = [
         ":token",
+        "//util:error",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
