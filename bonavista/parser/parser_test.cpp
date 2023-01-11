@@ -1,11 +1,11 @@
-#include "parser/parser.h"
+#include "bonavista/parser/parser.h"
 
-#include "lexer/lexer.h"
-#include "lexer/token_stream.h"
-#include "lexer/token_test_macros.h"
-#include "parser/node.h"
-#include "parser/parser_test_fixture.h"
-#include "util/status_macros.h"
+#include "bonavista/lexer/lexer.h"
+#include "bonavista/lexer/token_stream.h"
+#include "bonavista/lexer/token_test_macros.h"
+#include "bonavista/parser/node.h"
+#include "bonavista/parser/parser_test_fixture.h"
+#include "bonavista/util/status_macros.h"
 
 class TestLexer : public Lexer {
  public:

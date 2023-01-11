@@ -1,11 +1,11 @@
-#include "executer/executer.h"
+#include "bonavista/executer/executer.h"
 
 #include <gtest/gtest.h>
 
-#include "executer/executer_test_fixture.h"
-#include "lexer/lexer.h"
-#include "parser/node.h"
-#include "parser/parser.h"
+#include "bonavista/executer/executer_test_fixture.h"
+#include "bonavista/lexer/lexer.h"
+#include "bonavista/parser/node.h"
+#include "bonavista/parser/parser.h"
 
 class TestLexer : public Lexer {
  public:

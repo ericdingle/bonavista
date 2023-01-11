@@ -1,8 +1,8 @@
-#include "lexer/lexer.h"
+#include "bonavista/lexer/lexer.h"
 
 #include <gtest/gtest.h>
 
-#include "util/status_macros.h"
+#include "bonavista/util/status_macros.h"
 
 TEST(LexerTest, IsAlpha) {
   EXPECT_TRUE(Lexer::IsAlpha('a'));

@@ -1,10 +1,10 @@
-#include "lexer/token_stream.h"
+#include "bonavista/lexer/token_stream.h"
 
 #include <gtest/gtest.h>
 
 #include "absl/strings/str_cat.h"
-#include "lexer/lexer.h"
-#include "lexer/token_test_macros.h"
+#include "bonavista/lexer/lexer.h"
+#include "bonavista/lexer/token_test_macros.h"
 
 class TestLexer : public Lexer {
  public:

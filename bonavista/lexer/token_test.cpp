@@ -1,8 +1,8 @@
-#include "lexer/token.h"
+#include "bonavista/lexer/token.h"
 
 #include <gtest/gtest.h>
 
-#include "lexer/token_test_macros.h"
+#include "bonavista/lexer/token_test_macros.h"
 
 TEST(TokenTest, Constructor) {
   Token token(1, "lazy4", 12, 54);
