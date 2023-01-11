@@ -1,8 +1,8 @@
-#include "executer/executer.h"
+#include "bonavista/executer/executer.h"
 
 #include <assert.h>
 
-#include "parser/parser.h"
+#include "bonavista/parser/parser.h"
 
 Executer::Executer(Parser* parser) : parser_(parser) {
 }

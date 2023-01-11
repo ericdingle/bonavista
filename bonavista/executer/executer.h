@@ -6,10 +6,10 @@
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
-#include "parser/node.h"
-#include "parser/parser.h"
-#include "util/error.h"
-#include "util/status_macros.h"
+#include "bonavista/parser/node.h"
+#include "bonavista/parser/parser.h"
+#include "bonavista/util/error.h"
+#include "bonavista/util/status_macros.h"
 
 class Executer {
  public:

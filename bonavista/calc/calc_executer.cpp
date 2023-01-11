@@ -1,7 +1,7 @@
-#include "calc/calc_executer.h"
+#include "bonavista/calc/calc_executer.h"
 
-#include "calc/calc_lexer.h"
-#include "util/error.h"
+#include "bonavista/calc/calc_lexer.h"
+#include "bonavista/util/error.h"
 
 absl::StatusOr<std::any> CalcExecuter::ExecuteNode(const Node& node) {
   if (node.token().IsType(CalcLexer::TYPE_ASTERISK) ||

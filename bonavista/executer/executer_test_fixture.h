@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "lexer/token_stream.h"
+#include "bonavista/lexer/token_stream.h"
 
 template <typename LexerT, typename ParserT, typename ExecuterT>
 class ExecuterTestFixture : public testing::Test {

@@ -3,8 +3,8 @@ cc_library(
     hdrs = ["json_lexer.h"],
     srcs = ["json_lexer.cpp"],
     deps = [
-        "//lexer",
-        "//util:status_macros",
+        "//bonavista/lexer",
+        "//bonavista/util:status_macros",
     ],
 )
 
@@ -13,8 +13,8 @@ cc_test(
     srcs = ["json_lexer_test.cpp"],
     deps = [
         ":json_lexer",
-        "//lexer:lexer_test_fixture",
-        "//lexer:token_test_macros",
+        "//bonavista/lexer:lexer_test_fixture",
+        "//bonavista/lexer:token_test_macros",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -25,7 +25,7 @@ cc_library(
     srcs = ["json_parser.cpp"],
     deps = [
         ":json_lexer",
-        "//parser",
+        "//bonavista/parser",
     ],
 )
 
@@ -34,8 +34,8 @@ cc_test(
     srcs = ["json_parser_test.cpp"],
     deps = [
         ":json_parser",
-        "//lexer:token_test_macros",
-        "//parser:parser_test_fixture",
+        "//bonavista/lexer:token_test_macros",
+        "//bonavista/parser:parser_test_fixture",
         "@com_google_googletest//:gtest_main",
     ],
 )

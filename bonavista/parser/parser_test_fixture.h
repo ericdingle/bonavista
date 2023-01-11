@@ -4,9 +4,9 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "lexer/token_stream.h"
-#include "parser/node.h"
 #include "absl/status/statusor.h"
+#include "bonavista/lexer/token_stream.h"
+#include "bonavista/parser/node.h"
 
 template <typename LexerT, typename ParserT>
 class ParserTestFixture : public testing::Test {

@@ -1,7 +1,7 @@
-#include "calc/calc_lexer.h"
-#include "calc/calc_parser.h"
-#include "lexer/token_test_macros.h"
-#include "parser/parser_test_fixture.h"
+#include "bonavista/calc/calc_lexer.h"
+#include "bonavista/calc/calc_parser.h"
+#include "bonavista/lexer/token_test_macros.h"
+#include "bonavista/parser/parser_test_fixture.h"
 
 class CalcParserTest : public ParserTestFixture<CalcLexer, CalcParser> {
 };

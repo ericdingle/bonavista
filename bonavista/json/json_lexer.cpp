@@ -1,8 +1,8 @@
-#include "json/json_lexer.h"
+#include "bonavista/json/json_lexer.h"
 
 #include <cstring>
 
-#include "util/status_macros.h"
+#include "bonavista/util/status_macros.h"
 
 absl::StatusOr<std::unique_ptr<Token>> JsonLexer::GetToken(
     std::string_view input, int line, int column) const {

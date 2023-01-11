@@ -1,7 +1,7 @@
 #ifndef JSON_JSON_LEXER_H_
 #define JSON_JSON_LEXER_H_
 
-#include "lexer/lexer.h"
+#include "bonavista/lexer/lexer.h"
 
 class JsonLexer : public Lexer {
  public:

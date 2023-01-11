@@ -1,7 +1,7 @@
 #ifndef CALC_CALC_LEXER_H_
 #define CALC_CALC_LEXER_H_
 
-#include "lexer/lexer.h"
+#include "bonavista/lexer/lexer.h"
 
 class CalcLexer : public Lexer {
  public:

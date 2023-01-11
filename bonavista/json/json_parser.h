@@ -1,7 +1,7 @@
 #ifndef JSON_JSON_PARSER_H_
 #define JSON_JSON_PARSER_H_
 
-#include "parser/parser.h"
+#include "bonavista/parser/parser.h"
 
 class JsonParser : public Parser {
  public:

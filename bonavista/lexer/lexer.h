@@ -7,7 +7,7 @@
 
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
-#include "lexer/token.h"
+#include "bonavista/lexer/token.h"
 
 class Lexer {
  public:

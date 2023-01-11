@@ -1,7 +1,8 @@
-#include "calc/calc_executer.h"
-#include "calc/calc_lexer.h"
-#include "calc/calc_parser.h"
-#include "executer/executer_test_fixture.h"
+#include "bonavista/calc/calc_executer.h"
+
+#include "bonavista/calc/calc_lexer.h"
+#include "bonavista/calc/calc_parser.h"
+#include "bonavista/executer/executer_test_fixture.h"
 
 class CalcExecuterTest : public ExecuterTestFixture<CalcLexer, CalcParser, CalcExecuter> {
 };

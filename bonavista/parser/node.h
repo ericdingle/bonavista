@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "lexer/token.h"
+#include "bonavista/lexer/token.h"
 
 class Node {
  public:

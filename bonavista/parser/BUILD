@@ -4,7 +4,7 @@ cc_library(
     name = "node",
     hdrs = ["node.h"],
     srcs = ["node.cpp"],
-    deps = ["//lexer:token"],
+    deps = ["//bonavista/lexer:token"],
 )
 
 cc_library(
@@ -13,8 +13,8 @@ cc_library(
     srcs = ["parser.cpp"],
     deps = [
         ":node",
-        "//lexer:token",
-        "//lexer:token_stream",
+        "//bonavista/lexer:token",
+        "//bonavista/lexer:token_stream",
         "@com_google_absl//absl/status:statusor",
     ],
 )
@@ -25,7 +25,7 @@ cc_test(
     deps = [
         ":parser",
         ":parser_test_fixture",
-        "//lexer:token_test_macros",
+        "//bonavista/lexer:token_test_macros",
         "@com_google_googletest//:gtest_main",
     ],
 )

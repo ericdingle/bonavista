@@ -3,10 +3,11 @@
 #include <stdio.h>
 #include <string>
 #include <string.h>
-#include "calc/calc_executer.h"
-#include "calc/calc_lexer.h"
-#include "calc/calc_parser.h"
-#include "lexer/token_stream.h"
+
+#include "bonavista/calc/calc_executer.h"
+#include "bonavista/calc/calc_lexer.h"
+#include "bonavista/calc/calc_parser.h"
+#include "bonavista/lexer/token_stream.h"
 
 namespace {
 const char* kInputPrefix = "calc > ";

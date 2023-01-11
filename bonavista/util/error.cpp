@@ -1,4 +1,4 @@
-#include "util/error.h"
+#include "bonavista/util/error.h"
 
 absl::Status Error(std::string message, int line, int column) {
   return absl::InvalidArgumentError(

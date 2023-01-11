@@ -5,10 +5,10 @@ cc_library(
     hdrs = ["executer.h"],
     srcs = ["executer.cpp"],
     deps = [
-        "//parser",
-        "//parser:node",
-        "//util:error",
-        "//util:status_macros",
+        "//bonavista/parser",
+        "//bonavista/parser:node",
+        "//bonavista/util:error",
+        "//bonavista/util:status_macros",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
     ],
@@ -20,7 +20,7 @@ cc_test(
     deps = [
         ":executer",
         ":executer_test_fixture",
-        "//util:status_macros",
+        "//bonavista/util:status_macros",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -28,5 +28,5 @@ cc_test(
 cc_library(
     name = "executer_test_fixture",
     hdrs = ["executer_test_fixture.h"],
-    deps = ["//lexer:token_stream"],
+    deps = ["//bonavista/lexer:token_stream"],
 )

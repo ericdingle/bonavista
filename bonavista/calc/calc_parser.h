@@ -1,7 +1,7 @@
 #ifndef CALC_CALC_PARSER_H_
 #define CALC_CALC_PARSER_H_
 
-#include "parser/parser.h"
+#include "bonavista/parser/parser.h"
 
 class CalcParser : public Parser {
  public:

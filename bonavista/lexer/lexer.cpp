@@ -1,7 +1,7 @@
-#include "lexer/lexer.h"
+#include "bonavista/lexer/lexer.h"
 
 #include "absl/strings/str_cat.h"
-#include "util/error.h"
+#include "bonavista/util/error.h"
 
 const int Lexer::TYPE_END_OF_INPUT = -1;
 

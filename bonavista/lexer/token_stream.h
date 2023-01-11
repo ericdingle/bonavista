@@ -5,8 +5,8 @@
 #include <string_view>
 
 #include "absl/status/statusor.h"
-#include "lexer/lexer.h"
-#include "lexer/token.h"
+#include "bonavista/lexer/lexer.h"
+#include "bonavista/lexer/token.h"
 
 class TokenStream {
  public:

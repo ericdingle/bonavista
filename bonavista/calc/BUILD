@@ -4,8 +4,8 @@ cc_library(
     srcs = ["calc_executer.cpp"],
     deps = [
         ":calc_lexer",
-        "//executer",
-        "//util:error",
+        "//bonavista/executer",
+        "//bonavista/util:error",
     ],
 )
 
@@ -15,7 +15,7 @@ cc_test(
     deps = [
         ":calc_executer",
         ":calc_parser",
-        "//executer:executer_test_fixture",
+        "//bonavista/executer:executer_test_fixture",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -25,8 +25,8 @@ cc_library(
     hdrs = ["calc_lexer.h"],
     srcs = ["calc_lexer.cpp"],
     deps = [
-        "//lexer",
-        "//util:status_macros",
+        "//bonavista/lexer",
+        "//bonavista/util:status_macros",
     ],
 )
 
@@ -35,8 +35,8 @@ cc_test(
     srcs = ["calc_lexer_test.cpp"],
     deps = [
         ":calc_lexer",
-        "//lexer:lexer_test_fixture",
-        "//lexer:token_test_macros",
+        "//bonavista/lexer:lexer_test_fixture",
+        "//bonavista/lexer:token_test_macros",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -47,8 +47,8 @@ cc_library(
     srcs = ["calc_parser.cpp"],
     deps = [
         ":calc_lexer",
-        "//parser",
-        "//util:status_macros",
+        "//bonavista/parser",
+        "//bonavista/util:status_macros",
     ],
 )
 
@@ -58,8 +58,8 @@ cc_test(
     deps = [
         ":calc_lexer",
         ":calc_parser",
-        "//lexer:token_test_macros",
-        "//parser:parser_test_fixture",
+        "//bonavista/lexer:token_test_macros",
+        "//bonavista/parser:parser_test_fixture",
         "@com_google_googletest//:gtest_main",
     ],
 )

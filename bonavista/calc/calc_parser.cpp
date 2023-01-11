@@ -1,7 +1,7 @@
-#include "calc/calc_parser.h"
+#include "bonavista/calc/calc_parser.h"
 
-#include "calc/calc_lexer.h"
-#include "util/status_macros.h"
+#include "bonavista/calc/calc_lexer.h"
+#include "bonavista/util/status_macros.h"
 
 absl::StatusOr<std::unique_ptr<Node>> CalcParser::Parse() {
   ASSIGN_OR_RETURN(auto root, Parser::Parse());

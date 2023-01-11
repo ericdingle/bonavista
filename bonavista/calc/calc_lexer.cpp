@@ -1,6 +1,6 @@
-#include "calc/calc_lexer.h"
+#include "bonavista/calc/calc_lexer.h"
 
-#include "util/status_macros.h"
+#include "bonavista/util/status_macros.h"
 
 absl::StatusOr<std::unique_ptr<Token>> CalcLexer::GetToken(
     std::string_view input, int line, int column) const {

@@ -6,9 +6,9 @@
 #include <string>
 
 #include "absl/status/statusor.h"
-#include "lexer/token.h"
-#include "lexer/token_stream.h"
-#include "parser/node.h"
+#include "bonavista/lexer/token.h"
+#include "bonavista/lexer/token_stream.h"
+#include "bonavista/parser/node.h"
 
 class Parser {
  public:

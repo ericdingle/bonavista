@@ -1,4 +1,4 @@
-#include "lexer/token.h"
+#include "bonavista/lexer/token.h"
 
 Token::Token(int type, std::string_view value, int line, int column, int length)
     : type_(type),

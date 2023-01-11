@@ -1,6 +1,6 @@
-#include "calc/calc_lexer.h"
-#include "lexer/lexer_test_fixture.h"
-#include "lexer/token_test_macros.h"
+#include "bonavista/calc/calc_lexer.h"
+#include "bonavista/lexer/lexer_test_fixture.h"
+#include "bonavista/lexer/token_test_macros.h"
 
 class CalcLexerTest : public LexerTestFixture<CalcLexer> {
 };

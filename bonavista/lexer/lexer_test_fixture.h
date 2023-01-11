@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "absl/status/statusor.h"
-#include "lexer/token.h"
+#include "bonavista/lexer/token.h"
 
 template <typename LexerT>
 class LexerTestFixture : public testing::Test {

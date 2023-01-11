@@ -6,7 +6,7 @@ cc_library(
     srcs = ["lexer.cpp"],
     deps = [
         ":token",
-        "//util:error",
+        "//bonavista/util:error",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
@@ -19,7 +19,7 @@ cc_test(
     srcs = ["lexer_test.cpp"],
     deps = [
         ":lexer",
-        "//util:status_macros",
+        "//bonavista/util:status_macros",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -58,7 +58,7 @@ cc_library(
     srcs = ["token_stream.cpp"],
     deps = [
         ":lexer",
-        "//util:status_macros",
+        "//bonavista/util:status_macros",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
     ],

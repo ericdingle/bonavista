@@ -1,11 +1,11 @@
-#include "json/json_parser.h"
+#include "bonavista/json/json_parser.h"
 
-#include "json/json_lexer.h"
-#include "lexer/token_stream.h"
-#include "lexer/token_test_macros.h"
-#include "parser/node.h"
-#include "parser/parser_test_fixture.h"
-#include "util/status_macros.h"
+#include "bonavista/json/json_lexer.h"
+#include "bonavista/lexer/token_stream.h"
+#include "bonavista/lexer/token_test_macros.h"
+#include "bonavista/parser/node.h"
+#include "bonavista/parser/parser_test_fixture.h"
+#include "bonavista/util/status_macros.h"
 
 class JsonParserTest : public ParserTestFixture<JsonLexer, JsonParser> {};
 

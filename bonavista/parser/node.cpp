@@ -1,4 +1,4 @@
-#include "parser/node.h"
+#include "bonavista/parser/node.h"
 
 Node::Node(std::unique_ptr<const Token> token) : token_(std::move(token)) {}
 

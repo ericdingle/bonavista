@@ -1,7 +1,7 @@
-#include "lexer/token_stream.h"
+#include "bonavista/lexer/token_stream.h"
 
-#include "lexer/lexer.h"
-#include "util/status_macros.h"
+#include "bonavista/lexer/lexer.h"
+#include "bonavista/util/status_macros.h"
 
 TokenStream::TokenStream(const Lexer& lexer, std::string_view input)
     : lexer_(lexer), input_(input), index_(0), line_(1), column_(1) {}

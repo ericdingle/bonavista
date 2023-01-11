@@ -1,10 +1,10 @@
-#include "json/json_parser.h"
+#include "bonavista/json/json_parser.h"
 
 #include <vector>
 
-#include "json/json_lexer.h"
-#include "parser/node.h"
-#include "util/status_macros.h"
+#include "bonavista/json/json_lexer.h"
+#include "bonavista/parser/node.h"
+#include "bonavista/util/status_macros.h"
 
 JsonParser::JsonParser(TokenStream* token_stream) : Parser(token_stream) {}
 

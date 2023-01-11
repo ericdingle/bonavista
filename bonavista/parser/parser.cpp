@@ -1,8 +1,8 @@
-#include "parser/parser.h"
+#include "bonavista/parser/parser.h"
 
 #include "absl/strings/str_cat.h"
-#include "lexer/lexer.h"
-#include "util/status_macros.h"
+#include "bonavista/lexer/lexer.h"
+#include "bonavista/util/status_macros.h"
 
 Parser::Parser(TokenStream* token_stream) : token_stream_(token_stream) {}
 

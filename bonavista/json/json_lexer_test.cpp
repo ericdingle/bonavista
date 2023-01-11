@@ -1,11 +1,11 @@
-#include "json/json_lexer.h"
+#include "bonavista/json/json_lexer.h"
 
 #include <utility>
 
 #include "absl/strings/str_cat.h"
-#include "lexer/lexer_test_fixture.h"
-#include "lexer/token_test_macros.h"
-#include "util/status_macros.h"
+#include "bonavista/lexer/lexer_test_fixture.h"
+#include "bonavista/lexer/token_test_macros.h"
+#include "bonavista/util/status_macros.h"
 
 class JsonLexerTest : public LexerTestFixture<JsonLexer> {};
 

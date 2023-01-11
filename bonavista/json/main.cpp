@@ -1,12 +1,11 @@
-#include <stdio.h>
-
 #include <fstream>
+#include <stdio.h>
 #include <string>
 
-#include "json/json_lexer.h"
-#include "json/json_parser.h"
-#include "lexer/token_stream.h"
-#include "parser/node.h"
+#include "bonavista/json/json_lexer.h"
+#include "bonavista/json/json_parser.h"
+#include "bonavista/lexer/token_stream.h"
+#include "bonavista/parser/node.h"
 
 void PrintJsonTree(const Node& node, int level);
 
